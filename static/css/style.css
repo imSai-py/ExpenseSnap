@@ -114,6 +114,19 @@ body {
     padding: 12px 18px !important;
 }
 
+.form-label {
+    color: var(--text-main) !important;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-weight: 300;
+}
+
 .form-control:focus,
 .form-select:focus {
     box-shadow: 0 0 0 2px rgba(131, 58, 180, 0.5) !important;

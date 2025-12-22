@@ -36,17 +36,17 @@
                     <h5 class="mb-4">Log New Expense</h5>
                     <form action="/add" method="POST">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Item Name</label>
+                            <label class="form-label">Item Name</label>
                             <input type="text" name="item_name" class="form-control" placeholder="e.g. Starbucks Coffee"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Amount ($)</label>
+                            <label class="form-label">Amount ($)</label>
                             <input type="number" step="0.01" name="amount" class="form-control" placeholder="0.00"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Category</label>
+                            <label class="form-label">Category</label>
                             <select name="category" class="form-select">
                                 <option value="Food">Food</option>
                                 <option value="Transport">Transport</option>
@@ -133,16 +133,17 @@
                     <form id="editForm" method="POST">
                         <input type="hidden" id="edit-id" name="id">
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Item Name</label>
-                            <input type="text" id="edit-name" name="item_name" class="form-control" required>
+                            <label class="form-label">Item Name</label>
+                            <input type="text" id="edit-name" name="item_name" class="form-control"
+                                placeholder="Enter item name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Amount ($)</label>
+                            <label class="form-label">Amount ($)</label>
                             <input type="number" step="0.01" id="edit-amount" name="amount" class="form-control"
-                                required>
+                                placeholder="0.00" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted small">Category</label>
+                            <label class="form-label">Category</label>
                             <select id="edit-category" name="category" class="form-select">
                                 <option value="Food">Food</option>
                                 <option value="Transport">Transport</option>
