@@ -14,11 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = this.getAttribute('data-id');
             const name = this.getAttribute('data-name');
             const amount = this.getAttribute('data-amount');
+            const currency = this.getAttribute('data-currency');
             const category = this.getAttribute('data-category');
 
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-amount').value = amount;
+            document.getElementById('edit-currency').value = currency;
             document.getElementById('edit-category').value = category;
 
             // Set form action

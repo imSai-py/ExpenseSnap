@@ -17,33 +17,81 @@
 
 <body>
     <div class="container py-5">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
+        <!-- Header Section -->
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-7 text-start">
                 <h1 class="header-title animate-in">💰 ExpenseSnap</h1>
                 <p class="subtitle-glow animate-in">Master your finances with precision and style.</p>
             </div>
+            <div class="col-md-5 text-end animate-in">
+                <div class="user-profile-card">
+                    <div class="user-avatar">
+                        {{ username[0] | upper }}
+                    </div>
+                    <div class="text-start pe-3 border-end border-white border-opacity-10">
+                        <span class="welcome-text">Welcome back,</span>
+                        <span class="user-name">{{ username }}</span>
+                    </div>
+
+                    <!-- Global Currency Control -->
+                    <form action="{{ url_for('expenses.set_currency') }}" method="POST"
+                        class="d-flex align-items-center ms-2" id="currForm">
+                        <select name="preferred_currency"
+                            class="form-select form-select-sm bg-transparent border-0 text-light fw-bold"
+                            style="width: auto; cursor: pointer;" onchange="this.form.submit()">
+                            {% for code, symbol in currency_symbols.items() %}
+                            <option value="{{ code }}" {% if code==user_currency %}selected{% endif %}>{{ symbol }} {{
+                                code }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+
+                    <a href="{{ url_for('auth.logout') }}" class="logout-pill">Logout</a>
+                </div>
+            </div>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div
+            class="alert alert-{{ 'success' if category == 'success' else 'info' }} bg-dark text-light border-0 small mb-4 animate-in">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
         <div class="row g-4">
             <!-- Left Column: Input and Stats -->
             <div class="col-lg-4">
                 <div class="glass-card stat-card mb-4 animate-in">
-                    <p class="stat-label">Total Expenditures</p>
-                    <p class="stat-value">${{ "%.2f"|format(total) }}</p>
+                    <p class="stat-label">Total Portfolio Value ({{ user_currency }})</p>
+                    <p class="stat-value">{{ currency_symbols.get(user_currency, '$') }}{{ "%.2f"|format(total) }}</p>
+                    <p class="text-muted small mt-1">Converted using real-time baseline rates.</p>
                 </div>
 
                 <div class="glass-card p-4 mb-4 animate-in">
                     <h5 class="mb-4">Log New Expense</h5>
-                    <form action="/add" method="POST">
+                    <form action="{{ url_for('expenses.add_expense') }}" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Item Name</label>
                             <input type="text" name="item_name" class="form-control" placeholder="e.g. Starbucks Coffee"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Amount ($)</label>
-                            <input type="number" step="0.01" name="amount" class="form-control" placeholder="0.00"
-                                required>
+                            <label class="form-label">Amount & Currency</label>
+                            <div class="input-group">
+                                <select name="currency" class="form-select border-end-0 bg-dark text-light"
+                                    style="max-width: 100px; border-radius: 12px 0 0 12px;">
+                                    {% for code, symbol in currency_symbols.items() %}
+                                    <option value="{{ code }}" {% if code=='USD' %}selected{% endif %}>{{ code }} ({{
+                                        symbol }})</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="number" step="0.01" name="amount" class="form-control border-start-0"
+                                    placeholder="0.00" required style="border-radius: 0 12px 12px 0;">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Category</label>
@@ -90,15 +138,20 @@
                                             {{ expense.category }}
                                         </span>
                                     </td>
-                                    <td class="fw-bold">${{ "%.2f"|format(expense.amount) }}</td>
+                                    <td class="fw-bold">
+                                        <span class="text-primary me-1">{{ currency_symbols.get(expense.currency, '$')
+                                            }}</span>
+                                        {{ "%.2f"|format(expense.amount) }}
+                                    </td>
                                     <td class="text-muted small">{{ expense.date_added.strftime('%b %d, %Y') }}</td>
                                     <td>
                                         <button class="action-btn edit-btn" data-id="{{ expense.id }}"
                                             data-name="{{ expense.item_name }}" data-amount="{{ expense.amount }}"
+                                            data-currency="{{ expense.currency }}"
                                             data-category="{{ expense.category }}">
                                             <i data-lucide="pencil" style="width: 18px;"></i>
                                         </button>
-                                        <a href="{{ url_for('delete_expense', id=expense.id) }}"
+                                        <a href="{{ url_for('expenses.delete_expense', id=expense.id) }}"
                                             class="action-btn delete-btn">
                                             <i data-lucide="trash-2" style="width: 18px;"></i>
                                         </a>
@@ -138,9 +191,17 @@
                                 placeholder="Enter item name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Amount ($)</label>
-                            <input type="number" step="0.01" id="edit-amount" name="amount" class="form-control"
-                                placeholder="0.00" required>
+                            <label class="form-label">Amount & Currency</label>
+                            <div class="input-group">
+                                <select id="edit-currency" name="currency"
+                                    class="form-select border-end-0 bg-dark text-light" style="max-width: 100px;">
+                                    {% for code, symbol in currency_symbols.items() %}
+                                    <option value="{{ code }}">{{ code }} ({{ symbol }})</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="number" step="0.01" id="edit-amount" name="amount"
+                                    class="form-control border-start-0" placeholder="0.00" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Category</label>
