@@ -9,8 +9,12 @@ expenses = Blueprint('expenses', __name__)
 @expenses.route('/')
 @login_required
 def index():
+    # Ensure we have fresh data
+    db.session.expire_all()
+
     # READ: Get expenses for the logged-in user
-    user_expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date_added.desc()).all()
+    # Use explicit filter for better reliability
+    user_expenses = Expense.query.filter(Expense.user_id == current_user.id).order_by(Expense.date_added.desc()).all()
     
     # Accurate total: Convert all expenses to preferred currency
     pref_curr = current_user.preferred_currency

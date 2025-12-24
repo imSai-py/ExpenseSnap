@@ -129,8 +129,8 @@
                                     <th>Item</th>
                                     <th>Category</th>
                                     <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
+                                    <th class="d-none d-md-table-cell">Date</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -148,17 +148,18 @@
                                             }}</span>
                                         {{ "%.2f"|format(expense.amount) }}
                                     </td>
-                                    <td class="text-muted small">{{ expense.date_added.strftime('%b %d, %Y') }}</td>
-                                    <td>
-                                        <button class="action-btn edit-btn" data-id="{{ expense.id }}"
-                                            data-name="{{ expense.item_name }}" data-amount="{{ expense.amount }}"
-                                            data-currency="{{ expense.currency }}"
+                                    <td class="text-muted small d-none d-md-table-cell">{{
+                                        expense.date_added.strftime('%b %d, %Y') }}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-info edit-btn me-1"
+                                            data-id="{{ expense.id }}" data-name="{{ expense.item_name }}"
+                                            data-amount="{{ expense.amount }}" data-currency="{{ expense.currency }}"
                                             data-category="{{ expense.category }}">
-                                            <i data-lucide="pencil" style="width: 18px; pointer-events: none;"></i>
+                                            <i data-lucide="pencil" style="width: 16px; height: 16px;"></i>
                                         </button>
                                         <a href="{{ url_for('expenses.delete_expense', id=expense.id) }}"
-                                            class="action-btn delete-btn">
-                                            <i data-lucide="trash-2" style="width: 18px; pointer-events: none;"></i>
+                                            class="btn btn-sm btn-outline-danger delete-btn">
+                                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                                         </a>
                                     </td>
                                 </tr>

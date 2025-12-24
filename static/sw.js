@@ -1,6 +1,5 @@
-const CACHE_NAME = 'expensesnap-v1';
+const CACHE_NAME = 'expensesnap-v2';
 const urlsToCache = [
-    '/',
     '/static/css/style.css',
     '/static/js/script.js',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
@@ -9,6 +8,8 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+    // Force new service worker to activate immediately
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -19,6 +20,16 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+    // Network-first strategy for navigation (HTML) requests
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(() => {
+                return caches.match(event.request);
+            })
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -31,6 +42,9 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('activate', event => {
+    // Take control of all clients immediately
+    event.waitUntil(clients.claim());
+
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then(cacheNames => {
