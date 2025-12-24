@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 import os
 from .extensions import db, login_manager, oauth
 from dotenv import load_dotenv
@@ -33,6 +33,10 @@ def create_app():
     
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(expenses, url_prefix='/')
+    
+    @app.route('/sw.js')
+    def service_worker():
+        return send_from_directory(app.static_folder, 'sw.js', mimetype='application/javascript')
 
     # Create tables
     with app.app_context():
