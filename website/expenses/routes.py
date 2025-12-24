@@ -59,6 +59,7 @@ def add_expense():
     
     db.session.add(new_expense)
     db.session.commit()
+    flash('Expense added successfully.', 'success')
     return redirect(url_for('expenses.index'))
 
 @expenses.route('/delete/<int:id>')
@@ -67,6 +68,7 @@ def delete_expense(id):
     expense = Expense.query.filter_by(id=id, user_id=current_user.id).first_or_404()
     db.session.delete(expense)
     db.session.commit()
+    flash('Expense deleted successfully.', 'success')
     return redirect(url_for('expenses.index'))
 
 @expenses.route('/update/<int:id>', methods=['POST'])
@@ -78,6 +80,7 @@ def update_expense(id):
     expense.currency = request.form.get('currency', 'USD')
     expense.category = request.form.get('category')
     db.session.commit()
+    flash('Expense updated successfully.', 'success')
     return redirect(url_for('expenses.index'))
 
 @expenses.route('/set_currency', methods=['POST'])

@@ -10,7 +10,14 @@ def create_app():
     
     # Configure App
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-123')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+    
+    # Use PostgreSQL if DATABASE_URL is set, otherwise fallback to SQLite
+    database_url = os.getenv('DATABASE_URL')
+    if database_url and database_url.startswith("postgres://"):
+        # Fix for Heroku/PostgreSQL 12+ which uses postgres:// instead of postgresql://
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///expenses.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize Extensions

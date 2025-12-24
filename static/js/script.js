@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('edit-currency').value = currency;
             document.getElementById('edit-category').value = category;
 
-            // Set form action
+            // Set form action (removed hardcoded path)
             document.getElementById('editForm').action = `/update/${id}`;
 
             const modal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -43,6 +43,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize Chart if possible
     initChart();
+
+    // MODERN TOAST AUTO-DISMISS (5 SECONDS)
+    function handleToasts() {
+        const toasts = document.querySelectorAll('.toast-notification');
+        toasts.forEach(toast => {
+            if (!toast.dataset.processed) {
+                toast.dataset.processed = "true";
+                setTimeout(() => {
+                    toast.classList.add('fadeOut');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 400);
+                }, 5000);
+            }
+        });
+    }
+
+    handleToasts();
+    // Observe new toasts (if added via JS later, though currently we use Flask flashes)
+    const observer = new MutationObserver(handleToasts);
+    const toastContainer = document.querySelector('.toast-container');
+    if (toastContainer) {
+        observer.observe(toastContainer, { childList: true });
+    }
 });
 
 function initChart() {

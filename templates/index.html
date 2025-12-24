@@ -51,16 +51,17 @@
             </div>
         </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div
-            class="alert alert-{{ 'success' if category == 'success' else 'info' }} bg-dark text-light border-0 small mb-4 animate-in">
-            {{ message }}
+        <div class="toast-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="toast-notification {{ category }}">
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
         </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
 
         <div class="row g-4">
             <!-- Left Column: Input and Stats -->
@@ -68,7 +69,7 @@
                 <div class="glass-card stat-card mb-4 animate-in">
                     <p class="stat-label">Total Portfolio Value ({{ user_currency }})</p>
                     <p class="stat-value">{{ currency_symbols.get(user_currency, '$') }}{{ "%.2f"|format(total) }}</p>
-                    <p class="text-muted small mt-1">Converted using real-time baseline rates.</p>
+                    <p class="portfolio-footer">Converted using real-time baseline rates.</p>
                 </div>
 
                 <div class="glass-card p-4 mb-4 animate-in">
@@ -149,11 +150,11 @@
                                             data-name="{{ expense.item_name }}" data-amount="{{ expense.amount }}"
                                             data-currency="{{ expense.currency }}"
                                             data-category="{{ expense.category }}">
-                                            <i data-lucide="pencil" style="width: 18px;"></i>
+                                            <i data-lucide="pencil" style="width: 18px; pointer-events: none;"></i>
                                         </button>
                                         <a href="{{ url_for('expenses.delete_expense', id=expense.id) }}"
                                             class="action-btn delete-btn">
-                                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                                            <i data-lucide="trash-2" style="width: 18px; pointer-events: none;"></i>
                                         </a>
                                     </td>
                                 </tr>
