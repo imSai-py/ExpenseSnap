@@ -1,6 +1,5 @@
-const CACHE_NAME = 'expensesnap-v1';
+const CACHE_NAME = 'expensesnap-v2';
 const urlsToCache = [
-    '/',
     '/static/css/style.css',
     '/static/js/script.js',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
