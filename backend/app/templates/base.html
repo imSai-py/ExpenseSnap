@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ExpenseSnap{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #10B981;
+            --background-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-color: #1F2937;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: var(--sidebar-width);
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--card-bg);
+            border-right: 1px solid #E5E7EB;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #F3F4F6;
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338CA;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+
+<body>
+
+    {% if current_user.is_authenticated %}
+    <nav class="sidebar">
+        <div class="px-4 mb-4">
+            <h4 class="fw-bold text-primary"><i class="fas fa-wallet me-2"></i>ExpenseSnap</h4>
+        </div>
+        <div class="nav flex-column">
+            <a href="{{ url_for('expenses.index') }}"
+                class="nav-link {% if request.endpoint == 'expenses.index' %}active{% endif %}">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="{{ url_for('expenses.add_expense_page') }}"
+                class="nav-link {% if request.endpoint == 'expenses.add_expense_page' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i> Add Expense
+            </a>
+            <a href="{{ url_for('expenses.statistics') }}"
+                class="nav-link {% if request.endpoint == 'expenses.statistics' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> Statistics
+            </a>
+            <a href="{{ url_for('expenses.profile') }}"
+                class="nav-link {% if request.endpoint == 'expenses.profile' %}active{% endif %}">
+                <i class="fas fa-user-cog"></i> Profile & Settings
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger mt-4">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="main-content">
+        <div class="container-fluid">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+                role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

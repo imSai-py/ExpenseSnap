@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - ExpenseSnap{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center p-4">
+                <div class="position-relative d-inline-block mb-3">
+                    {% if user.profile_photo %}
+                    <img src="{{ user.profile_photo }}" alt="Profile" class="rounded-circle img-fluid"
+                        style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-light d-flex justify-content-center align-items-center mx-auto"
+                        style="width: 120px; height: 120px;">
+                        <span class="fs-1 fw-bold text-primary">{{ user.username[0]|upper }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <h4 class="fw-bold">{{ user.username }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                <div class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                    Free Plan
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold mb-0">Preferences</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('expenses.set_currency') }}" method="POST">
+                    {{ currency_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ currency_form.preferred_currency.label(class="form-label fw-medium") }}
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-coins text-muted"></i>
+                            </span>
+                            {{ currency_form.preferred_currency(class="form-select border-start-0 ps-0") }}
+                        </div>
+                        <div class="form-text">This will update the currency symbol displayed across your dashboard.
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Preferences</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold mb-0 text-danger">Danger Zone</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted small">Once you delete your account, there is no going back. Please be certain.</p>
+                <button class="btn btn-outline-danger" disabled>Delete Account (Coming Soon)</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

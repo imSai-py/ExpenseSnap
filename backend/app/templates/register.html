@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Register - ExpenseSnap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">Create Account</h3>
+                    <p class="text-muted">Start tracking your expenses effectively</p>
+                </div>
+
+                <form action="{{ url_for('auth.register') }}" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="Choose a username") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control", placeholder="Enter your email (optional)") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Choose a password") }}
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                            At least 8 chars, 1 uppercase, 1 lowercase, 1 number
+                        </small>
+                    </div>
+                    <div class="mb-4">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 fw-medium">
+                            Register
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="small text-muted mb-0">Already have an account? <a href="{{ url_for('auth.login') }}"
+                            class="text-decoration-none">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

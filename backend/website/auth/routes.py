@@ -1,0 +1,233 @@
+"""
+Authentication routes.
+
+Handles user login, registration, logout, and OAuth flows
+with proper form validation and error handling.
+"""
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify, request
+from flask_login import login_user, logout_user, current_user, login_required
+
+from ..extensions import db, oauth
+from ..models.user import User
+from .forms import LoginForm, RegistrationForm
+
+auth = Blueprint('auth', __name__)
+
+
+@auth.route('/login/google')
+def google_login():
+    """Initiate Google OAuth flow."""
+    try:
+        google = oauth.create_client('google')
+        redirect_uri = url_for('auth.google_auth', _external=True)
+        return google.authorize_redirect(redirect_uri)
+    except Exception as e:
+        current_app.logger.error(f"Google login error: {e}")
+        flash('Unable to connect to Google. Please try again.', 'error')
+        return redirect(url_for('auth.login'))
+
+
+@auth.route('/auth/callback')
+def google_auth():
+    """Handle Google OAuth callback."""
+    try:
+        google = oauth.create_client('google')
+        token = google.authorize_access_token()
+        user_info = token.get('userinfo')
+
+        if user_info:
+            email = user_info['email']
+            username = user_info.get('name', email.split('@')[0])
+
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                user = User(
+                    username=username,
+                    email=email,
+                    preferred_currency='USD'
+                )
+                db.session.add(user)
+                db.session.commit()
+                current_app.logger.info(f"New OAuth user registered: {email}")
+
+            login_user(user)
+            current_app.logger.info(f"OAuth login successful: {email}")
+            return redirect(url_for('expenses.index'))
+
+    except Exception as e:
+        current_app.logger.error(f"Google auth callback error: {e}")
+        db.session.rollback()
+        flash('Authentication failed. Please try again.', 'error')
+
+    return redirect(url_for('auth.login'))
+
+
+
+
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    User login via API.
+    GET: Returns login status
+    POST: Expects JSON data: { "username": "...", "password": "..." }
+    """
+    import traceback
+
+    # Handle GET request - return JSON status
+    if request.method == 'GET':
+        if current_user.is_authenticated:
+            return jsonify({'success': True, 'authenticated': True, 'user': current_user.to_dict()})
+        return jsonify({'success': False, 'authenticated': False, 'error': 'Not logged in'}), 401
+
+    # Handle POST request - login
+    if current_user.is_authenticated:
+        return jsonify({'success': True, 'message': 'Already logged in', 'user': current_user.to_dict()})
+
+    try:
+        # Parse JSON data
+        data = request.get_json(silent=True)
+        if not data:
+            current_app.logger.warning("Login attempt with missing JSON data")
+            return jsonify({'success': False, 'error': 'Missing JSON data'}), 400
+
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+
+        if not username or not password:
+            current_app.logger.warning(f"Login attempt with missing credentials for username: {username or '(empty)'}")
+            return jsonify({'success': False, 'error': 'Username and password are required'}), 400
+
+        # Database query for user
+        try:
+            user = User.query.filter_by(username=username).first()
+        except Exception as db_error:
+            current_app.logger.error(f"Database error during login lookup: {db_error}")
+            current_app.logger.error(f"Traceback: {traceback.format_exc()}")
+            return jsonify({'success': False, 'error': 'Database connection error. Please try again.'}), 500
+
+        # Verify password
+        if user and user.check_password(password):
+            # Login the user
+            try:
+                login_user(user)
+            except Exception as login_error:
+                current_app.logger.error(f"Flask-Login error: {login_error}")
+                current_app.logger.error(f"Traceback: {traceback.format_exc()}")
+                return jsonify({'success': False, 'error': 'Session creation failed. Please try again.'}), 500
+
+            current_app.logger.info(f"User logged in successfully: {user.username}")
+
+            # Initialize notification preferences (wrapped in try-except to prevent login failure)
+            try:
+                # Any notification-related initialization can go here
+                # This ensures push service failures don't block login
+                _safe_initialize_notifications(user)
+            except Exception as notif_error:
+                # Log the error but don't fail the login
+                current_app.logger.warning(f"Notification initialization failed for user {user.username}: {notif_error}")
+                current_app.logger.warning(f"Notification error traceback: {traceback.format_exc()}")
+                # Continue with login - notifications are non-critical
+
+            return jsonify({'success': True, 'user': user.to_dict()}), 200
+        else:
+            current_app.logger.warning(f"Failed login attempt for username: {username}")
+            return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+
+    except Exception as e:
+        # Catch-all for any unexpected errors
+        current_app.logger.error(f"Unexpected login error: {e}")
+        current_app.logger.error(f"Full traceback: {traceback.format_exc()}")
+        return jsonify({'success': False, 'error': 'Login failed. Please try again.'}), 500
+
+
+def _safe_initialize_notifications(user):
+    """
+    Safely initialize notification-related settings for a user.
+    This function is wrapped in a try-except in the login route,
+    so any failures here won't prevent login.
+    """
+    try:
+        # Check if VAPID keys are configured (optional, for debugging)
+        vapid_private_key = current_app.config.get('VAPID_PRIVATE_KEY')
+        if not vapid_private_key:
+            current_app.logger.debug("VAPID_PRIVATE_KEY not configured - push notifications disabled")
+
+        # Any other notification initialization can go here
+        # For example, checking push subscriptions, etc.
+
+    except Exception as e:
+        # Re-raise to let the caller handle it
+        raise e
+
+
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    """
+    User registration via API.
+    GET: Returns registration status info
+    POST: Expects JSON data: { "username": "...", "password": "...", "email": "..." }
+    """
+    # Handle GET request
+    if request.method == 'GET':
+        if current_user.is_authenticated:
+            return jsonify({'success': True, 'authenticated': True})
+        return jsonify({'success': True, 'authenticated': False, 'message': 'Ready for registration'})
+
+    # Handle POST request - register
+    if current_user.is_authenticated:
+        return jsonify({'success': True, 'message': 'Already logged in'})
+
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({'success': False, 'error': 'Missing JSON data'}), 400
+
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        email = data.get('email', '').strip()
+
+        if not username or not password:
+            return jsonify({'success': False, 'error': 'Username and password are required'}), 400
+
+        if User.query.filter_by(username=username).first():
+            return jsonify({'success': False, 'error': 'Username already exists'}), 409
+
+        new_user = User(
+            username=username,
+            email=email if email else None,
+            preferred_currency='USD'
+        )
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        current_app.logger.info(f"New user registered: {username}")
+
+        # Auto login after register
+        login_user(new_user)
+
+        return jsonify({'success': True, 'user': new_user.to_dict()}), 201
+
+    except Exception as e:
+        current_app.logger.error(f"Registration error: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': 'Registration failed. Please try again.'}), 500
+
+
+@auth.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    """Log out current user via API."""
+    current_app.logger.info(f"User logged out: {current_user.username}")
+    logout_user()
+    return jsonify({'success': True})
+
+
+@auth.route('/check-auth', methods=['GET'])
+def check_auth():
+    """Check if user is authenticated and return user data."""
+    if current_user.is_authenticated:
+        return jsonify({'authenticated': True, 'user': current_user.to_dict()})
+    else:
+        return jsonify({'authenticated': False}), 401

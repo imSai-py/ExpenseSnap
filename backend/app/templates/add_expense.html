@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense - ExpenseSnap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                <h4 class="fw-bold mb-0">Add New Transaction</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('expenses.add_expense_page') }}" method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.item_name.label(class="form-label") }}
+                        {{ form.item_name(class="form-control form-control-lg", placeholder="What did you spend on?") }}
+                        {% if form.item_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.item_name.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            {{ form.amount.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-money-bill-wave text-muted"></i>
+                                </span>
+                                {{ form.amount(class="form-control border-start-0 ps-0", placeholder="0.00") }}
+                            </div>
+                            {% if form.amount.errors %}
+                            <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            {{ form.currency.label(class="form-label") }}
+                            {{ form.currency(class="form-select") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.category.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-tag text-muted"></i>
+                            </span>
+                            {{ form.category(class="form-select border-start-0 ps-0") }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus-circle me-2"></i> Save Transaction
+                        </button>
+                        <a href="{{ url_for('expenses.index') }}" class="btn btn-light btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

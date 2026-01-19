@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - ExpenseSnap{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold">Statistics</h2>
+        <p class="text-muted">Analyze your spending habits.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4 mb-md-0">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-4">Expenses by Category</h5>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-4">Spending Summary</h5>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                        <i class="fas fa-coins fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-0">Total Spent (All Time)</p>
+                        <h3 class="fw-bold mb-0">{{ currency_symbols.get(user_currency, user_currency) }} {{ total }}
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 d-flex align-items-center" role="alert">
+                    <i class="fas fa-lightbulb me-2 fa-lg"></i>
+                    <div>
+                        <strong>Pro Tip:</strong> Download a detailed report to identify more saving opportunities.
+                    </div>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <a href="{{ url_for('expenses.api.generate_report') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-download me-2"></i> Download PDF Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_labels | safe }},
+    datasets: [{
+        data: {{ chart_values | safe }},
+        backgroundColor: [
+        '#4F46E5', '#10B981', '#F59E0B', '#EF4444',
+        '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6'
+    ],
+        borderWidth: 0,
+        hoverOffset: 10
+            }]
+        },
+    options: {
+        responsive: true,
+            maintainAspectRatio: false,
+                plugins: {
+            legend: {
+                position: 'bottom',
+                    labels: {
+                    padding: 20,
+                        usePointStyle: true
+                }
+            }
+        },
+        cutout: '75%'
+    }
+    });
+</script>
+{% endblock %}

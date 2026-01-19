@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__figma__get_metadata",
+      "Bash(npm create vite@latest frontend:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(node -e:*)",
+      "Bash(npm run dev)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build)",
+      "Bash(cat:*)",
+      "Bash(./venv/Scripts/pip install:*)",
+      "Bash(curl:*)",
+      "Bash(./venv/Scripts/python:*)",
+      "Bash(python:*)",
+      "Bash(set FLASK_APP=main.py)",
+      "Bash(pip install:*)",
+      "Bash(pip show:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(tasklist:*)",
+      "Bash(npx vite build:*)",
+      "Bash(where python:*)",
+      "Bash(taskkill:*)",
+      "Bash(start \"\" cmd /c \"python main.py\")",
+      "Bash(ping:*)"
+    ]
+  }
+}
