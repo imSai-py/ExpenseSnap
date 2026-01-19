@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Login - ExpenseSnap{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">Welcome Back!</h3>
+                    <p class="text-muted">Sign in to continue managing your expenses</p>
+                </div>
+
+                <form action="{{ url_for('auth.login') }}" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="Enter your username") }}
+                    </div>
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 fw-medium">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="small text-muted mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}"
+                            class="text-decoration-none">Register here</a></p>
+                </div>
+
+                <div class="position-relative mt-4 mb-4 text-center">
+                    <hr class="text-muted opacity-25">
+                    <span
+                        class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">OR</span>
+                </div>
+
+                <div class="d-grid">
+                    <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline-dark">
+                        <i class="fab fa-google me-2"></i> Sign in with Google
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
