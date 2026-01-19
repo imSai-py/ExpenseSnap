@@ -13,3 +13,4 @@ flask-migrate
 APScheduler
 pandas
 openpyxl
+gunicorn
