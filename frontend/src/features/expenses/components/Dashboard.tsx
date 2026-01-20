@@ -3,6 +3,7 @@ import { Plus, FileText, ShoppingCart, Utensils, Car, House, Briefcase, Heart, T
 import { useExpenses } from '../../../shared/context/ExpenseContext';
 import { BalanceCard } from '../../../shared/components/BalanceCard';
 import { ActionButton } from '../../../shared/components/ActionButton';
+import { NotificationBell } from '../../../shared/components/NotificationBell';
 import { ExpenseListItem } from './ExpenseListItem';
 import { SwipeableExpenseItem } from './SwipeableExpenseItem';
 import { EditExpenseModal } from './EditExpenseModal';
@@ -191,25 +192,31 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
         <div className="bg-white px-4 py-6 shadow-sm md:hidden">
           <div className="max-w-md mx-auto flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-[#111827]">ExpenseSnap</h1>
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-[#4F46E5] flex items-center justify-center">
-              {user?.profile_photo ? (
-                <img
-                  src={user.profile_photo}
-                  alt={user.username}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-white font-semibold text-sm">{initials}</span>
-              )}
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#4F46E5] flex items-center justify-center">
+                {user?.profile_photo ? (
+                  <img
+                    src={user.profile_photo}
+                    alt={user.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white font-semibold text-sm">{initials}</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Desktop Header */}
         <div className="hidden md:block bg-white px-8 py-6 border-b border-[#E5E7EB]">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-semibold text-[#111827]">Dashboard</h1>
-            <p className="text-[#6B7280] mt-1">Welcome back! Here's your financial overview.</p>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-[#111827]">Dashboard</h1>
+              <p className="text-[#6B7280] mt-1">Welcome back! Here's your financial overview.</p>
+            </div>
+            <NotificationBell />
           </div>
         </div>
 

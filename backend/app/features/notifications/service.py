@@ -16,7 +16,7 @@ from pywebpush import webpush, WebPushException
 from app.core.extensions import db
 from app.features.users.models import User
 from app.features.expenses.models import Expense
-from app.features.notifications.models import PushSubscription
+from app.features.notifications.models import PushSubscription, NotificationHistory
 
 logger = logging.getLogger(__name__)
 
@@ -480,6 +480,24 @@ def check_budget_and_notify(user_id: int) -> dict:
             # Mark that we sent the alert this month (spam prevention)
             user.budget_alert_sent_month = current_month
             db.session.commit()
+
+            # Save notification to history for in-app viewing
+            try:
+                NotificationHistory.create_notification(
+                    user_id=user_id,
+                    notification_type='budget_alert',
+                    title=title,
+                    message=body,
+                    data={
+                        'percentage': percentage,
+                        'url': '/statistics',
+                        'threshold_exceeded': result['threshold_exceeded']
+                    }
+                )
+                logger.info(f'Notification saved to history for user {user_id}')
+            except Exception as history_error:
+                # Don't fail if history save fails
+                logger.warning(f'Failed to save notification to history: {history_error}')
 
             result['notification_sent'] = True
             result['reason'] = f'Alert sent to {sent_count} device(s)'

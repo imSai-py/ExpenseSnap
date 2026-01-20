@@ -1,4 +1,4 @@
-import type { Expense, ExpenseSummary, User, ProfileUpdateData, NotificationPreferences, ChangePasswordData, ImportPreviewResult, ImportResult, ExpenseFilters } from '../types';
+import type { Expense, ExpenseSummary, User, ProfileUpdateData, NotificationPreferences, ChangePasswordData, ImportPreviewResult, ImportResult, ExpenseFilters, NotificationHistoryItem, NotificationHistoryResponse } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -386,5 +386,54 @@ export const api = {
       throw new Error(data.error || 'Failed to import expenses');
     }
     return data;
+  },
+
+  // ============================================================================
+  // Notification History Methods
+  // ============================================================================
+
+  async getNotificationHistory(unreadOnly: boolean = false, limit: number = 50): Promise<NotificationHistoryResponse> {
+    const params = new URLSearchParams();
+    if (unreadOnly) params.append('unread_only', 'true');
+    if (limit) params.append('limit', limit.toString());
+
+    const url = `${API_BASE_URL}/notifications/history${params.toString() ? '?' + params.toString() : ''}`;
+    const response = await fetchWithCredentials(url);
+    const data = await parseJsonResponse(response);
+    if (!data.success) throw new Error(data.error || 'Failed to fetch notification history');
+    return data as NotificationHistoryResponse;
+  },
+
+  async getUnreadNotificationCount(): Promise<number> {
+    const response = await fetchWithCredentials(`${API_BASE_URL}/notifications/unread-count`);
+    const data = await parseJsonResponse(response);
+    if (!data.success) throw new Error(data.error || 'Failed to fetch unread count');
+    return (data as { unread_count: number }).unread_count;
+  },
+
+  async markNotificationAsRead(id: number): Promise<NotificationHistoryItem> {
+    const response = await fetchWithCredentials(`${API_BASE_URL}/notifications/${id}/read`, {
+      method: 'PUT',
+    });
+    const data = await parseJsonResponse(response);
+    if (!data.success) throw new Error(data.error || 'Failed to mark notification as read');
+    return (data as { notification: NotificationHistoryItem }).notification;
+  },
+
+  async markAllNotificationsAsRead(): Promise<number> {
+    const response = await fetchWithCredentials(`${API_BASE_URL}/notifications/mark-all-read`, {
+      method: 'POST',
+    });
+    const data = await parseJsonResponse(response);
+    if (!data.success) throw new Error(data.error || 'Failed to mark all notifications as read');
+    return (data as { updated_count: number }).updated_count;
+  },
+
+  async deleteNotification(id: number): Promise<void> {
+    const response = await fetchWithCredentials(`${API_BASE_URL}/notifications/${id}`, {
+      method: 'DELETE',
+    });
+    const data = await parseJsonResponse(response);
+    if (!data.success) throw new Error(data.error || 'Failed to delete notification');
   },
 };

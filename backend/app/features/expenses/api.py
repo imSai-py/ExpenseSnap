@@ -15,7 +15,7 @@ import pandas as pd
 from app.core.extensions import db
 from app.features.expenses.models import Expense
 from app.features.users.models import User
-from app.features.notifications.models import PushSubscription
+from app.features.notifications.models import PushSubscription, NotificationHistory
 from .services import ExpenseService
 from .utils import CURRENCY_SYMBOLS
 from .report_generator import generate_expense_report
@@ -910,6 +910,140 @@ def update_notifications():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f'Error updating notifications: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================================================
+# Notification History Endpoints
+# ============================================================================
+
+@api.route('/notifications/history', methods=['GET'])
+@login_required
+def get_notification_history():
+    """Get notification history for the current user.
+
+    Query Parameters:
+        unread_only: If 'true', only return unread notifications
+        limit: Maximum number of notifications to return (default: 50)
+    """
+    try:
+        unread_only = request.args.get('unread_only', 'false').lower() == 'true'
+        limit = min(int(request.args.get('limit', 50)), 100)  # Max 100
+
+        notifications = NotificationHistory.get_user_notifications(
+            user_id=current_user.id,
+            unread_only=unread_only,
+            limit=limit
+        )
+
+        unread_count = NotificationHistory.get_unread_count(current_user.id)
+
+        return jsonify({
+            'success': True,
+            'notifications': [n.to_dict() for n in notifications],
+            'unread_count': unread_count
+        })
+    except Exception as e:
+        current_app.logger.error(f'Error fetching notification history: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api.route('/notifications/unread-count', methods=['GET'])
+@login_required
+def get_unread_notification_count():
+    """Get count of unread notifications for the current user."""
+    try:
+        unread_count = NotificationHistory.get_unread_count(current_user.id)
+        return jsonify({
+            'success': True,
+            'unread_count': unread_count
+        })
+    except Exception as e:
+        current_app.logger.error(f'Error fetching unread count: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api.route('/notifications/<int:id>/read', methods=['PUT'])
+@login_required
+def mark_notification_read(id):
+    """Mark a specific notification as read."""
+    try:
+        notification = NotificationHistory.query.filter_by(
+            id=id,
+            user_id=current_user.id
+        ).first()
+
+        if not notification:
+            return jsonify({
+                'success': False,
+                'error': 'Notification not found'
+            }), 404
+
+        notification.mark_as_read()
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'notification': notification.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error marking notification as read: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+def mark_all_notifications_read():
+    """Mark all notifications as read for the current user."""
+    try:
+        updated_count = NotificationHistory.query.filter_by(
+            user_id=current_user.id,
+            is_read=False
+        ).update({
+            'is_read': True,
+            'read_at': datetime.utcnow()
+        })
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': f'Marked {updated_count} notification(s) as read',
+            'updated_count': updated_count
+        })
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error marking all notifications as read: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api.route('/notifications/<int:id>', methods=['DELETE'])
+@login_required
+def delete_notification(id):
+    """Delete a specific notification."""
+    try:
+        notification = NotificationHistory.query.filter_by(
+            id=id,
+            user_id=current_user.id
+        ).first()
+
+        if not notification:
+            return jsonify({
+                'success': False,
+                'error': 'Notification not found'
+            }), 404
+
+        db.session.delete(notification)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Notification deleted'
+        })
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error deleting notification: {e}')
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

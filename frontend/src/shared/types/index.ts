@@ -108,3 +108,28 @@ export interface ExpenseFilters {
   category?: string;
   type?: 'expense' | 'income';
 }
+
+// Notification History Types
+export type NotificationType = 'budget_alert' | 'daily_reminder' | 'system';
+
+export interface NotificationHistoryItem {
+  id: number;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: {
+    percentage?: number;
+    url?: string;
+    threshold_exceeded?: boolean;
+    [key: string]: unknown;
+  } | null;
+  is_read: boolean;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface NotificationHistoryResponse {
+  success: boolean;
+  notifications: NotificationHistoryItem[];
+  unread_count: number;
+}
