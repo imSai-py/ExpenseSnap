@@ -272,9 +272,13 @@ def register():
 
     except Exception as e:
         current_app.logger.error(f"Registration error: {e}")
+        import traceback
+        current_app.logger.error(f"Traceback: {traceback.format_exc()}")
         db.session.rollback()
         if is_api_request:
-            return jsonify({'success': False, 'error': 'Registration failed. Please try again.'}), 500
+            # Include error details in development, generic message in production
+            error_msg = str(e) if current_app.debug else 'Registration failed. Please try again.'
+            return jsonify({'success': False, 'error': error_msg}), 500
         flash('Registration failed. Please try again.', 'error')
         return redirect(url_for('auth.register'))
 

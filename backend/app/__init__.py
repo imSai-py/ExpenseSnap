@@ -135,9 +135,14 @@ def create_app(config_name: Optional[str] = None) -> Flask:
             mimetype='application/javascript'
         )
 
-    # Create database tables
+    # Create database tables - import all models first to ensure they're registered
     with app.app_context():
+        # Import models to ensure they're registered with SQLAlchemy
+        from app.features.users.models import User
+        from app.features.expenses.models import Expense
+        from app.features.notifications.models import PushSubscription, NotificationHistory
         db.create_all()
+        app.logger.info("Database tables created/verified")
 
     # Start notification scheduler (optional - for production with APScheduler)
     if os.environ.get('ENABLE_NOTIFICATION_SCHEDULER', '').lower() == 'true':
