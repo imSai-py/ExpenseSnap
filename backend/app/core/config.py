@@ -28,10 +28,10 @@ class Config:
         'echo': False,                   # Set to True to log all SQL queries
     }
 
-    # Session security
-    SESSION_COOKIE_SECURE: bool = True
+    # Session security - for cross-domain (Vercel frontend + Render backend)
+    SESSION_COOKIE_SECURE: bool = True  # Required for SameSite=None
     SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = 'Lax'
+    SESSION_COOKIE_SAMESITE: str = 'None'  # Allow cross-domain cookies
 
     # CSRF Protection
     WTF_CSRF_ENABLED: bool = True
