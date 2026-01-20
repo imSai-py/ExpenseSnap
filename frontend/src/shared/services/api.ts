@@ -34,8 +34,11 @@ interface ApiResponse {
   expense?: Expense;
   summary?: ExpenseSummary;
   user?: User;
-  notifications?: NotificationPreferences;
+  notifications?: NotificationPreferences | NotificationHistoryItem[];
+  notification?: NotificationHistoryItem;
   message?: string;
+  unread_count?: number;
+  updated_count?: number;
 }
 
 async function parseJsonResponse(response: Response): Promise<ApiResponse> {
