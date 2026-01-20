@@ -54,6 +54,7 @@ def create_app(config_name: Optional[str] = None) -> Flask:
         "https://expensesnap-crp6.onrender.com",
         "https://expensesnap.onrender.com",
         # Production origins - Vercel frontend
+        "https://expense-snap-chi.vercel.app",
         "https://expensesnap.vercel.app",
         "https://expense-snap.vercel.app",
     ]
