@@ -41,22 +41,34 @@ def create_app(config_name: Optional[str] = None) -> Flask:
     app.config['SQLALCHEMY_DATABASE_URI'] = config[config_name].get_database_uri()
     config[config_name].init_app(app)
 
+    # CORS configuration - allow both development and production origins
+    allowed_origins = [
+        # Development origins
+        "http://localhost:5000",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5000",
+        # Production origins - Render backend
+        "https://expensesnap-crp6.onrender.com",
+        "https://expensesnap.onrender.com",
+        # Production origins - Vercel frontend
+        "https://expensesnap.vercel.app",
+        "https://expense-snap.vercel.app",
+    ]
+
+    # Also allow custom Vercel URLs from environment variable
+    vercel_url = os.environ.get('VERCEL_FRONTEND_URL')
+    if vercel_url:
+        allowed_origins.append(vercel_url)
+
     CORS(app, resources={
         r"/*": {
-            "origins": [
-                "http://localhost:5000",
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://localhost:5175",
-                "http://localhost:5176",
-                "http://localhost:5177",
-                "http://localhost:5178",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:5000",
-                "https://expensesnap-crp6.onrender.com",
-                "https://expensesnap.onrender.com"
-            ],
-            "supports_credentials": True
+            "origins": allowed_origins,
+            "supports_credentials": True,
+            "allow_headers": ["Content-Type", "Authorization", "Accept"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
         }
     })
 

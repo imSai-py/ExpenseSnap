@@ -1,6 +1,31 @@
 import type { Expense, ExpenseSummary, User, ProfileUpdateData, NotificationPreferences, ChangePasswordData, ImportPreviewResult, ImportResult, ExpenseFilters, NotificationHistoryItem, NotificationHistoryResponse } from '../types';
 
-const API_BASE_URL = '/api';
+/**
+ * Determine the API base URL based on environment
+ * - Development: Uses Vite proxy (empty string = relative URLs like '/api/...')
+ * - Production: Uses the Render backend URL from environment variable
+ */
+const getApiBaseUrl = (): string => {
+  // In production, use the environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
+  // In development, use relative URL (Vite proxy handles it)
+  return '/api';
+};
+
+/**
+ * Get the auth base URL (for /login, /register, /logout - not under /api prefix)
+ */
+const getAuthBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  return '';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const AUTH_BASE_URL = getAuthBaseUrl();
 
 interface ApiResponse {
   success: boolean;
@@ -174,7 +199,7 @@ export const api = {
 
     let response: Response;
     try {
-      response = await fetchWithCredentials('/login', {
+      response = await fetchWithCredentials(`${AUTH_BASE_URL}/login`, {
         method: 'POST',
         body: JSON.stringify(credentials),
       });
@@ -214,7 +239,7 @@ export const api = {
   },
 
   async register(credentials: any): Promise<User> {
-    const response = await fetchWithCredentials('/register', {
+    const response = await fetchWithCredentials(`${AUTH_BASE_URL}/register`, {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -224,7 +249,7 @@ export const api = {
   },
 
   async logout(): Promise<void> {
-    await fetchWithCredentials('/logout', { method: 'POST' });
+    await fetchWithCredentials(`${AUTH_BASE_URL}/logout`, { method: 'POST' });
   },
 
   async updateCurrency(currency: string): Promise<void> {
