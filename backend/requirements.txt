@@ -1,4 +1,4 @@
-﻿Flask
+Flask
 Flask-SQLAlchemy
 Flask-Login
 Flask-WTF
@@ -14,3 +14,5 @@ APScheduler
 pandas
 openpyxl
 gunicorn
+matplotlib
+reportlab
