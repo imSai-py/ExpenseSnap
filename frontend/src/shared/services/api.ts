@@ -21,28 +21,35 @@ async function parseJsonResponse(response: Response): Promise<ApiResponse> {
     // Check for 401 Unauthorized specifically
     if (response.status === 401) {
       // Try to parse error message from response
-      try {
-        const errorData = JSON.parse(text);
-        throw new Error(errorData.error || 'Invalid username or password');
-      } catch (e) {
-        // If it's already our custom error, re-throw it
-        if (e instanceof Error && e.message !== 'Unexpected token') {
-          throw e;
+      if (text && text.trim()) {
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.error || 'Invalid username or password');
+        } catch (e) {
+          // If it's our custom Error (not a JSON parse error), re-throw it
+          if (e instanceof Error && !e.message.includes('JSON')) {
+            throw e;
+          }
+          // JSON parse failed, use default message
         }
-        throw new Error('Invalid username or password');
       }
+      throw new Error('Invalid username or password');
     }
 
     // For other errors, try to parse JSON error message
-    try {
-      const errorData = JSON.parse(text);
-      throw new Error(errorData.error || `Request failed with status ${response.status}`);
-    } catch (e) {
-      if (e instanceof Error && e.message !== `Request failed with status ${response.status}`) {
-        throw e; // Re-throw if it's our custom error
+    if (text && text.trim()) {
+      try {
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+      } catch (e) {
+        // If it's our custom Error (not a JSON parse error), re-throw it
+        if (e instanceof Error && !e.message.includes('JSON')) {
+          throw e;
+        }
+        // JSON parse failed, use default message
       }
-      throw new Error(`Request failed with status ${response.status}`);
     }
+    throw new Error(`Request failed with status ${response.status}`);
   }
 
   // Handle empty responses for successful requests
