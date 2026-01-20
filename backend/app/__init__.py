@@ -141,6 +141,10 @@ def create_app(config_name: Optional[str] = None) -> Flask:
         from app.features.users.models import User
         from app.features.expenses.models import Expense
         from app.features.notifications.models import PushSubscription, NotificationHistory
+
+        # Run migrations for missing columns (for existing databases)
+        _run_schema_migrations(app, db)
+
         db.create_all()
         app.logger.info("Database tables created/verified")
 
@@ -188,6 +192,57 @@ def _test_database_connection(app: Flask) -> None:
     from sqlalchemy.exc import OperationalError, ProgrammingError
 
     with app.app_context():
+
+
+def _run_schema_migrations(app: Flask, db) -> None:
+    """
+    Run schema migrations to add missing columns to existing databases.
+    This handles cases where the database was created before new columns were added.
+    """
+    from sqlalchemy import text, inspect
+
+    try:
+        inspector = inspect(db.engine)
+
+        # Check if we're using PostgreSQL
+        if 'postgresql' not in str(db.engine.url):
+            return  # Skip for SQLite - it uses db.create_all() which works fine
+
+        # Get existing columns in user table
+        existing_columns = [col['name'] for col in inspector.get_columns('user')]
+
+        # Add profile_photo if missing
+        if 'profile_photo' not in existing_columns:
+            app.logger.info("Adding missing column: user.profile_photo")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN profile_photo VARCHAR(500)'))
+            db.session.commit()
+            app.logger.info("Added profile_photo column successfully")
+
+        # Check if notification_history table exists
+        existing_tables = inspector.get_table_names()
+        if 'notification_history' not in existing_tables:
+            app.logger.info("Creating notification_history table")
+            db.session.execute(text('''
+                CREATE TABLE IF NOT EXISTS notification_history (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES "user"(id),
+                    notification_type VARCHAR(50) NOT NULL,
+                    title VARCHAR(200) NOT NULL,
+                    message TEXT NOT NULL,
+                    data JSON,
+                    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    read_at TIMESTAMP
+                )
+            '''))
+            db.session.execute(text('CREATE INDEX IF NOT EXISTS idx_nh_user_id ON notification_history(user_id)'))
+            db.session.execute(text('CREATE INDEX IF NOT EXISTS idx_nh_user_unread ON notification_history(user_id, is_read)'))
+            db.session.commit()
+            app.logger.info("Created notification_history table successfully")
+
+    except Exception as e:
+        app.logger.warning(f"Schema migration check failed (may be OK for new databases): {e}")
+        db.session.rollback()
         try:
             # Attempt a simple query to test the connection
             db.session.execute(text('SELECT 1'))
