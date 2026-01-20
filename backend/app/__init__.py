@@ -192,6 +192,15 @@ def _test_database_connection(app: Flask) -> None:
     from sqlalchemy.exc import OperationalError, ProgrammingError
 
     with app.app_context():
+        try:
+            # Attempt a simple query to test the connection
+            db.session.execute(text('SELECT 1'))
+            db.session.commit()
+            app.logger.info("Database connection successful!")
+        except OperationalError as e:
+            app.logger.error(f"Database connection failed: {e}")
+        except Exception as e:
+            app.logger.error(f"Unexpected database error: {e}")
 
 
 def _run_schema_migrations(app: Flask, db) -> None:
