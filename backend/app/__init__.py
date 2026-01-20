@@ -249,6 +249,17 @@ def _run_schema_migrations(app: Flask, db) -> None:
             db.session.commit()
             app.logger.info("Added budget_alert_sent_month column successfully")
 
+        # ---- EXPENSE TABLE MIGRATIONS ----
+        expense_columns = [col['name'] for col in inspector.get_columns('expense')]
+        app.logger.info(f"Existing expense columns: {expense_columns}")
+
+        # Add type column if missing (for income/expense differentiation)
+        if 'type' not in expense_columns:
+            app.logger.info("Adding missing column: expense.type")
+            db.session.execute(text("ALTER TABLE expense ADD COLUMN type VARCHAR(10) NOT NULL DEFAULT 'expense'"))
+            db.session.commit()
+            app.logger.info("Added expense.type column successfully")
+
         # Check if notification_history table exists
         existing_tables = inspector.get_table_names()
         if 'notification_history' not in existing_tables:
