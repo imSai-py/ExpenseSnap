@@ -37,7 +37,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=True, index=True)
     password_hash = db.Column(db.String(255), nullable=True)
     preferred_currency = db.Column(db.String(10), nullable=False, default='USD')
-    profile_photo = db.Column(db.String(500), nullable=True)
+    profile_photo = db.Column(db.Text, nullable=True)  # Stores base64 data URL
 
     # Notification preferences
     notify_daily_reminders = db.Column(db.Boolean, nullable=False, default=True)

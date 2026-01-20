@@ -795,37 +795,28 @@ def update_profile():
                         'error': 'File too large. Maximum size is 5MB'
                     }), 400
 
-                # Generate unique filename
+                # Read file and convert to base64 data URL
+                import base64
+                file_data = file.read()
                 file_ext = file.filename.rsplit('.', 1)[1].lower()
-                unique_filename = f"{current_user.id}_{uuid.uuid4().hex}.{file_ext}"
-                secure_name = secure_filename(unique_filename)
 
-                # Save file
-                upload_folder = get_upload_folder()
-                file_path = os.path.join(upload_folder, secure_name)
+                # Map extensions to MIME types
+                mime_types = {
+                    'jpg': 'image/jpeg',
+                    'jpeg': 'image/jpeg',
+                    'png': 'image/png',
+                    'gif': 'image/gif',
+                    'webp': 'image/webp'
+                }
+                mime_type = mime_types.get(file_ext, 'image/jpeg')
 
-                current_app.logger.info(f"Upload folder: {upload_folder}")
-                current_app.logger.info(f"File path: {file_path}")
+                # Create base64 data URL
+                base64_data = base64.b64encode(file_data).decode('utf-8')
+                data_url = f"data:{mime_type};base64,{base64_data}"
 
-                # Delete old profile photo if exists
-                if current_user.profile_photo:
-                    # Build path relative to the static folder
-                    old_filename = current_user.profile_photo.replace('/static/', '')
-                    old_photo_path = os.path.join(current_app.static_folder, old_filename)
-                    old_photo_path = os.path.normpath(old_photo_path)
-                    if os.path.exists(old_photo_path):
-                        try:
-                            os.remove(old_photo_path)
-                            current_app.logger.info(f"Deleted old photo: {old_photo_path}")
-                        except OSError as e:
-                            current_app.logger.warning(f"Failed to delete old photo: {e}")
-
-                file.save(file_path)
-                current_app.logger.info(f"File saved to: {file_path}")
-
-                # Store relative URL path
-                current_user.profile_photo = f"/static/uploads/profiles/{secure_name}"
-                current_app.logger.info(f"Profile photo URL set to: {current_user.profile_photo}")
+                # Store data URL in database (works on Render's ephemeral storage)
+                current_user.profile_photo = data_url
+                current_app.logger.info(f"Profile photo saved as base64 data URL (size: {len(data_url)} chars)")
 
         db.session.commit()
 

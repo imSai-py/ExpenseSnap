@@ -221,12 +221,18 @@ def _run_schema_migrations(app: Flask, db) -> None:
         existing_columns = [col['name'] for col in inspector.get_columns('user')]
         app.logger.info(f"Existing user columns: {existing_columns}")
 
-        # Add profile_photo if missing
+        # Add profile_photo if missing, or alter to TEXT if it exists as VARCHAR
         if 'profile_photo' not in existing_columns:
             app.logger.info("Adding missing column: user.profile_photo")
-            db.session.execute(text('ALTER TABLE "user" ADD COLUMN profile_photo VARCHAR(500)'))
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN profile_photo TEXT'))
             db.session.commit()
             app.logger.info("Added profile_photo column successfully")
+        else:
+            # Alter column type to TEXT to support base64 data URLs
+            app.logger.info("Altering profile_photo column to TEXT type")
+            db.session.execute(text('ALTER TABLE "user" ALTER COLUMN profile_photo TYPE TEXT'))
+            db.session.commit()
+            app.logger.info("Altered profile_photo to TEXT successfully")
 
         # Add notify_daily_reminders if missing
         if 'notify_daily_reminders' not in existing_columns:
