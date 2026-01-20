@@ -219,6 +219,7 @@ def _run_schema_migrations(app: Flask, db) -> None:
 
         # Get existing columns in user table
         existing_columns = [col['name'] for col in inspector.get_columns('user')]
+        app.logger.info(f"Existing user columns: {existing_columns}")
 
         # Add profile_photo if missing
         if 'profile_photo' not in existing_columns:
@@ -226,6 +227,27 @@ def _run_schema_migrations(app: Flask, db) -> None:
             db.session.execute(text('ALTER TABLE "user" ADD COLUMN profile_photo VARCHAR(500)'))
             db.session.commit()
             app.logger.info("Added profile_photo column successfully")
+
+        # Add notify_daily_reminders if missing
+        if 'notify_daily_reminders' not in existing_columns:
+            app.logger.info("Adding missing column: user.notify_daily_reminders")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN notify_daily_reminders BOOLEAN NOT NULL DEFAULT TRUE'))
+            db.session.commit()
+            app.logger.info("Added notify_daily_reminders column successfully")
+
+        # Add notify_budget_alerts if missing
+        if 'notify_budget_alerts' not in existing_columns:
+            app.logger.info("Adding missing column: user.notify_budget_alerts")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN notify_budget_alerts BOOLEAN NOT NULL DEFAULT TRUE'))
+            db.session.commit()
+            app.logger.info("Added notify_budget_alerts column successfully")
+
+        # Add budget_alert_sent_month if missing
+        if 'budget_alert_sent_month' not in existing_columns:
+            app.logger.info("Adding missing column: user.budget_alert_sent_month")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN budget_alert_sent_month VARCHAR(7)'))
+            db.session.commit()
+            app.logger.info("Added budget_alert_sent_month column successfully")
 
         # Check if notification_history table exists
         existing_tables = inspector.get_table_names()
