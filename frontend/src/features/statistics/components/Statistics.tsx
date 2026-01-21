@@ -34,12 +34,27 @@ export function Statistics() {
   const [budgetInput, setBudgetInput] = useState<string>('');
   const [isSavingBudget, setIsSavingBudget] = useState(false);
   const [budgetSaveSuccess, setBudgetSaveSuccess] = useState(false);
+  const [budgetError, setBudgetError] = useState<string | null>(null);
+
+  // Get API base URL (same logic as api.ts)
+  const getApiBaseUrl = (): string => {
+    if (import.meta.env.VITE_API_URL) {
+      return `${import.meta.env.VITE_API_URL}/api`;
+    }
+    return '/api';
+  };
 
   // Fetch current budget limit on mount
   useEffect(() => {
     const fetchBudgetLimit = async () => {
       try {
-        const response = await fetch('/api/user/budget', { credentials: 'include' });
+        const response = await fetch(`${getApiBaseUrl()}/user/budget`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        });
         const data = await response.json();
         if (data.success) {
           setMonthlyLimit(data.monthly_limit);
@@ -54,27 +69,39 @@ export function Statistics() {
 
   const handleSaveBudget = async () => {
     const amount = parseFloat(budgetInput) || 0;
-    if (amount < 0) return;
+    if (amount < 0) {
+      setBudgetError('Budget must be a positive number');
+      return;
+    }
 
     setIsSavingBudget(true);
     setBudgetSaveSuccess(false);
+    setBudgetError(null);
 
     try {
-      const response = await fetch('/api/update-budget', {
+      const response = await fetch(`${getApiBaseUrl()}/update-budget`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         credentials: 'include',
         body: JSON.stringify({ monthly_limit: amount })
       });
 
       const data = await response.json();
+
       if (data.success) {
         setMonthlyLimit(data.monthly_limit);
         setBudgetSaveSuccess(true);
-        setTimeout(() => setBudgetSaveSuccess(false), 2000);
+        // Show success for 3 seconds
+        setTimeout(() => setBudgetSaveSuccess(false), 3000);
+      } else {
+        setBudgetError(data.error || 'Failed to save budget');
       }
     } catch (err) {
       console.error('Failed to save budget limit:', err);
+      setBudgetError('Network error. Please try again.');
     } finally {
       setIsSavingBudget(false);
     }
@@ -296,33 +323,55 @@ export function Statistics() {
                   <input
                     type="number"
                     value={budgetInput}
-                    onChange={(e) => setBudgetInput(e.target.value)}
+                    onChange={(e) => {
+                      setBudgetInput(e.target.value);
+                      setBudgetError(null); // Clear error on input change
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveBudget();
+                    }}
                     placeholder="Enter budget limit"
                     min="0"
-                    className="w-full pl-8 pr-4 py-3 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent text-[#111827] placeholder-[#9CA3AF]"
+                    className={`w-full pl-8 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent text-[#111827] placeholder-[#9CA3AF] ${
+                      budgetError ? 'border-[#DC2626]' : 'border-[#E5E7EB]'
+                    }`}
                   />
                 </div>
                 <button
                   onClick={handleSaveBudget}
                   disabled={isSavingBudget}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 min-w-[120px] ${
+                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 min-w-[140px] ${
                     budgetSaveSuccess
                       ? 'bg-[#16A34A] text-white'
                       : 'bg-[#4F46E5] text-white hover:bg-[#4338CA]'
                   } disabled:opacity-60`}
                 >
                   {isSavingBudget ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Saving...
+                    </>
                   ) : budgetSaveSuccess ? (
                     <>
                       <Check className="w-5 h-5" />
-                      Saved
+                      Saved!
                     </>
                   ) : (
                     'Save Budget'
                   )}
                 </button>
               </div>
+              {/* Error message */}
+              {budgetError && (
+                <p className="mt-2 text-sm text-[#DC2626]">{budgetError}</p>
+              )}
+              {/* Success toast */}
+              {budgetSaveSuccess && (
+                <div className="mt-3 p-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl flex items-center gap-2">
+                  <Check className="w-5 h-5 text-[#16A34A]" />
+                  <span className="text-sm text-[#16A34A] font-medium">Budget limit saved successfully!</span>
+                </div>
+              )}
               {monthlyLimit > 0 && (
                 <div className="mt-4 p-3 bg-[#F9FAFB] rounded-xl">
                   <div className="flex items-center justify-between text-sm">
