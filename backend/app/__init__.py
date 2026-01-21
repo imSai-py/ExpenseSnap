@@ -255,6 +255,13 @@ def _run_schema_migrations(app: Flask, db) -> None:
             db.session.commit()
             app.logger.info("Added budget_alert_sent_month column successfully")
 
+        # Add monthly_limit if missing (for custom budget alerts)
+        if 'monthly_limit' not in existing_columns:
+            app.logger.info("Adding missing column: user.monthly_limit")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN monthly_limit NUMERIC(10,2) NOT NULL DEFAULT 0'))
+            db.session.commit()
+            app.logger.info("Added monthly_limit column successfully")
+
         # ---- EXPENSE TABLE MIGRATIONS ----
         expense_columns = [col['name'] for col in inspector.get_columns('expense')]
         app.logger.info(f"Existing expense columns: {expense_columns}")
