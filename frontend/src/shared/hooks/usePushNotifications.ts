@@ -7,7 +7,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { PushPermissionState, PushNotificationState } from '../types';
 
-const API_BASE_URL = '/api';
+/**
+ * Get the API base URL based on environment
+ * - Production: Uses VITE_API_URL environment variable (Render backend)
+ * - Development: Uses relative URL (Vite proxy handles it)
+ */
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Convert a base64 string to Uint8Array (for VAPID key)
