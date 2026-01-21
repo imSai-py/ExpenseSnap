@@ -326,26 +326,23 @@ def _register_error_handlers(app: Flask) -> None:
     def not_found_error(error):
         """Handle 404 Not Found errors."""
         app.logger.warning(f"404 error: {error}")
-        if is_api_request():
-            return jsonify({'success': False, 'error': 'Not found'}), 404
-        return render_template('errors/404.html'), 404
+        # Always return JSON since we use React frontend
+        return jsonify({'success': False, 'error': 'Not found'}), 404
 
     @app.errorhandler(500)
     def internal_error(error):
         """Handle 500 Internal Server errors."""
         db.session.rollback()
         app.logger.error(f"500 error: {error}")
-        if is_api_request():
-            return jsonify({'success': False, 'error': 'Internal server error'}), 500
-        return render_template('errors/500.html'), 500
+        # Always return JSON since we use React frontend
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
     @app.errorhandler(403)
     def forbidden_error(error):
         """Handle 403 Forbidden errors."""
         app.logger.warning(f"403 error: {error}")
-        if is_api_request():
-            return jsonify({'success': False, 'error': 'Forbidden'}), 403
-        return render_template('errors/403.html'), 403
+        # Always return JSON since we use React frontend
+        return jsonify({'success': False, 'error': 'Forbidden'}), 403
 
     @app.errorhandler(400)
     def bad_request_error(error):
