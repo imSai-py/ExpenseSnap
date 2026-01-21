@@ -331,6 +331,15 @@ export function usePushNotifications() {
         const applicationServerKey = urlBase64ToUint8Array(key);
         console.log('[Push] Application server key length:', applicationServerKey.length);
 
+        // IMPORTANT: First check for and remove any existing subscription
+        // This prevents "Registration failed - push service error" when VAPID keys change
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (existingSubscription) {
+          console.log('[Push] Found existing subscription, unsubscribing first...');
+          await existingSubscription.unsubscribe();
+          console.log('[Push] Unsubscribed from old subscription');
+        }
+
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: applicationServerKey as BufferSource,
