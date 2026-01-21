@@ -322,13 +322,52 @@ export function usePushNotifications() {
         }));
         return false;
       }
+      console.log('[Push] VAPID key received:', key.substring(0, 20) + '...');
 
-      // Step 4: Subscribe to push manager
+      // Step 4: Subscribe to push manager with detailed error handling
       console.log('[Push] Step 4: Subscribing to push manager...');
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(key) as BufferSource,
-      });
+      let subscription;
+      try {
+        const applicationServerKey = urlBase64ToUint8Array(key);
+        console.log('[Push] Application server key length:', applicationServerKey.length);
+
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: applicationServerKey as BufferSource,
+        });
+        console.log('[Push] Push manager subscription successful');
+      } catch (pushError) {
+        // Detailed error logging for push manager subscribe
+        const errorMessage = pushError instanceof Error ? pushError.message : String(pushError);
+        const errorName = pushError instanceof Error ? pushError.name : 'Unknown';
+
+        console.error('[Push] Push manager subscribe failed:', {
+          name: errorName,
+          message: errorMessage,
+          error: pushError
+        });
+
+        // Provide specific error messages based on error type
+        let userMessage = 'Failed to register with push service.';
+        if (errorMessage.includes('permission')) {
+          userMessage = 'Notification permission denied. Please enable in browser settings.';
+        } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+          userMessage = 'Network error. Please check your connection and try again.';
+        } else if (errorMessage.includes('abort')) {
+          userMessage = 'Push registration was aborted. Please try again.';
+        } else if (errorName === 'InvalidStateError') {
+          userMessage = 'Push subscription already exists or is in invalid state. Try refreshing the page.';
+        } else if (errorName === 'NotAllowedError') {
+          userMessage = 'Push notifications not allowed. Please enable in browser settings.';
+        }
+
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: `${userMessage} (${errorName}: ${errorMessage})`,
+        }));
+        return false;
+      }
 
       // Step 5: Send subscription to server
       console.log('[Push] Step 5: Saving subscription to server...');

@@ -5,7 +5,30 @@
  * This file must be in the public/ folder to be served at the root.
  */
 
-const CACHE_NAME = 'expensesnap-v5';
+const CACHE_NAME = 'expensesnap-v6';
+
+// ============================================================================
+// API URL Configuration - Dynamically detect production vs development
+// ============================================================================
+
+/**
+ * Get the API base URL based on the current origin.
+ * In production (Vercel), this points to the Render backend.
+ * In development, it uses relative URLs.
+ */
+function getApiBaseUrl() {
+  const origin = self.location.origin;
+
+  // Production: Vercel frontend -> Render backend
+  if (origin.includes('vercel.app') || origin.includes('expense-snap')) {
+    return 'https://expensesnap-crp6.onrender.com/api';
+  }
+
+  // Development: Use relative URL (same origin)
+  return '/api';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 // ============================================================================
 // Installation
@@ -214,8 +237,8 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       applicationServerKey: event.oldSubscription?.options?.applicationServerKey
     })
     .then((newSubscription) => {
-      // Send the new subscription to the server
-      return fetch('/api/push/subscribe', {
+      // Send the new subscription to the server using dynamic API URL
+      return fetch(`${API_BASE_URL}/push/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
