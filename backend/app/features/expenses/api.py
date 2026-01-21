@@ -860,6 +860,78 @@ def update_currency():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@api.route('/update-budget', methods=['PUT'])
+@login_required
+def update_budget_limit():
+    """Update user's monthly budget limit.
+
+    Accepts JSON with:
+        - monthly_limit: The budget limit amount (number >= 0)
+
+    Returns:
+        Success status and updated monthly_limit value
+    """
+    try:
+        data = request.get_json()
+        monthly_limit = data.get('monthly_limit')
+
+        # Validate monthly_limit
+        if monthly_limit is None:
+            return jsonify({
+                'success': False,
+                'error': 'monthly_limit is required'
+            }), 400
+
+        try:
+            monthly_limit = Decimal(str(monthly_limit))
+            if monthly_limit < 0:
+                return jsonify({
+                    'success': False,
+                    'error': 'monthly_limit must be a positive number'
+                }), 400
+        except (InvalidOperation, ValueError):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid monthly_limit value'
+            }), 400
+
+        # Update the user's monthly limit
+        current_user.monthly_limit = monthly_limit
+
+        # Reset the budget alert flag when user updates their limit
+        # This allows them to get a new alert based on the new limit
+        current_user.budget_alert_sent_month = None
+
+        db.session.commit()
+
+        current_app.logger.info(f'User {current_user.id} updated monthly_limit to {monthly_limit}')
+
+        return jsonify({
+            'success': True,
+            'monthly_limit': float(monthly_limit),
+            'message': 'Budget limit updated successfully'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f'Error updating budget limit: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api.route('/user/budget', methods=['GET'])
+@login_required
+def get_budget_limit():
+    """Get user's current monthly budget limit."""
+    try:
+        return jsonify({
+            'success': True,
+            'monthly_limit': float(current_user.monthly_limit) if current_user.monthly_limit else 0
+        })
+    except Exception as e:
+        current_app.logger.error(f'Error fetching budget limit: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @api.route('/user/notifications', methods=['GET'])
 @login_required
 def get_notifications():

@@ -362,6 +362,10 @@ def check_budget_and_notify(user_id: int) -> dict:
     It includes spam prevention to avoid sending the same alert multiple times
     in the same month.
 
+    Priority:
+    1. If user has set a monthly_limit > 0, use that for budget alerts
+    2. Otherwise, fall back to income-based calculation
+
     Args:
         user_id: The ID of the user to check
 
@@ -372,18 +376,20 @@ def check_budget_and_notify(user_id: int) -> dict:
             'threshold_exceeded': bool,
             'notification_sent': bool,
             'reason': str (why notification was/wasn't sent),
-            'percentage': int (spending percentage, if calculated)
+            'percentage': int (spending percentage, if calculated),
+            'budget_type': str ('monthly_limit' or 'income_based')
         }
     """
     from flask import current_app
     from datetime import datetime
-    
+
     result = {
         'checked': True,
         'threshold_exceeded': False,
         'notification_sent': False,
         'reason': '',
-        'percentage': None
+        'percentage': None,
+        'budget_type': None
     }
 
     try:
@@ -413,7 +419,7 @@ def check_budget_and_notify(user_id: int) -> dict:
             result['reason'] = 'No push subscriptions'
             return result
 
-        # Calculate this month's income and expenses
+        # Calculate this month's expenses
         today = datetime.utcnow()
         month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
@@ -422,24 +428,38 @@ def check_budget_and_notify(user_id: int) -> dict:
             Expense.date_added >= month_start
         ).all()
 
-        total_income = sum(
-            exp.amount for exp in month_expenses
-            if exp.type == 'income'
-        ) or Decimal('0')
-
         total_expense = sum(
             exp.amount for exp in month_expenses
             if exp.type == 'expense'
         ) or Decimal('0')
 
-        # Can't calculate ratio without income
-        if total_income <= 0:
-            result['reason'] = 'No income recorded this month'
-            return result
+        # Determine budget basis: monthly_limit or income
+        monthly_limit = float(user.monthly_limit) if user.monthly_limit else 0
 
-        # Calculate spending ratio
+        if monthly_limit > 0:
+            # User has set a manual monthly budget limit
+            result['budget_type'] = 'monthly_limit'
+            budget_basis = Decimal(str(monthly_limit))
+            logger.debug(f'Using monthly_limit for user {user_id}: {monthly_limit}')
+        else:
+            # Fall back to income-based calculation
+            result['budget_type'] = 'income_based'
+            total_income = sum(
+                exp.amount for exp in month_expenses
+                if exp.type == 'income'
+            ) or Decimal('0')
+
+            # Can't calculate ratio without income
+            if total_income <= 0:
+                result['reason'] = 'No income recorded this month and no monthly limit set'
+                return result
+
+            budget_basis = total_income
+            logger.debug(f'Using income-based budget for user {user_id}: {total_income}')
+
+        # Get threshold from config (default 80%)
         threshold = current_app.config.get('BUDGET_ALERT_THRESHOLD', 0.8)
-        expense_ratio = float(total_expense) / float(total_income)
+        expense_ratio = float(total_expense) / float(budget_basis)
         percentage = int(expense_ratio * 100)
         result['percentage'] = percentage
 
@@ -450,15 +470,25 @@ def check_budget_and_notify(user_id: int) -> dict:
 
         # Threshold exceeded!
         result['threshold_exceeded'] = True
-        logger.info(f'Budget threshold exceeded for user {user_id}: {percentage}% (threshold: {int(threshold * 100)}%)')
+        logger.info(f'Budget threshold exceeded for user {user_id}: {percentage}% (threshold: {int(threshold * 100)}%, type: {result["budget_type"]})')
 
         # Prepare and send notification
-        if expense_ratio >= 1.0:
-            title = "⚠️ Budget Exceeded!"
-            body = f"You've spent {percentage}% of your income this month. Consider reviewing your expenses."
+        if result['budget_type'] == 'monthly_limit':
+            # Using manual monthly limit
+            if expense_ratio >= 1.0:
+                title = "⚠️ Budget Exceeded!"
+                body = f"You've spent {percentage}% of your ₹{monthly_limit:,.0f} monthly budget. Time to review your expenses!"
+            else:
+                title = "📊 Budget Alert"
+                body = f"You've spent {percentage}% of your ₹{monthly_limit:,.0f} monthly budget. Approaching your limit!"
         else:
-            title = "📊 Budget Alert"
-            body = f"You've spent {percentage}% of your income this month. Approaching your limit!"
+            # Using income-based calculation
+            if expense_ratio >= 1.0:
+                title = "⚠️ Budget Exceeded!"
+                body = f"You've spent {percentage}% of your income this month. Consider reviewing your expenses."
+            else:
+                title = "📊 Budget Alert"
+                body = f"You've spent {percentage}% of your income this month. Approaching your limit!"
 
         sent_count = NotificationService.send_to_user(
             user,
@@ -468,7 +498,8 @@ def check_budget_and_notify(user_id: int) -> dict:
             data={
                 'type': 'budget_alert',
                 'url': '/statistics',
-                'percentage': percentage
+                'percentage': percentage,
+                'budget_type': result['budget_type']
             },
             actions=[
                 {'action': 'view', 'title': 'View Stats'},
@@ -491,7 +522,8 @@ def check_budget_and_notify(user_id: int) -> dict:
                     data={
                         'percentage': percentage,
                         'url': '/statistics',
-                        'threshold_exceeded': result['threshold_exceeded']
+                        'threshold_exceeded': result['threshold_exceeded'],
+                        'budget_type': result['budget_type']
                     }
                 )
                 logger.info(f'Notification saved to history for user {user_id}')
@@ -501,7 +533,7 @@ def check_budget_and_notify(user_id: int) -> dict:
 
             result['notification_sent'] = True
             result['reason'] = f'Alert sent to {sent_count} device(s)'
-            logger.info(f'Budget alert sent to user {user_id}: {percentage}% spent, {sent_count} devices')
+            logger.info(f'Budget alert sent to user {user_id}: {percentage}% spent, {sent_count} devices, type: {result["budget_type"]}')
         else:
             result['reason'] = 'Failed to send notification'
             logger.warning(f'Budget alert failed to send for user {user_id}')

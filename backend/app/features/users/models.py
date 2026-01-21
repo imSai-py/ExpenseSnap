@@ -48,6 +48,9 @@ class User(UserMixin, db.Model):
     # Resets each month so user gets notified once per month when exceeding threshold
     budget_alert_sent_month = db.Column(db.String(7), nullable=True)  # Format: "2024-01"
 
+    # Monthly budget limit set by user (0 means not set, will fall back to income-based alerts)
+    monthly_limit = db.Column(db.Numeric(10, 2), nullable=False, default=0)
+
     expenses = db.relationship('Expense', backref='owner', lazy='dynamic')
 
     def __repr__(self) -> str:
@@ -96,5 +99,6 @@ class User(UserMixin, db.Model):
             'preferred_currency': self.preferred_currency,
             'profile_photo': self.profile_photo,
             'notify_daily_reminders': self.notify_daily_reminders,
-            'notify_budget_alerts': self.notify_budget_alerts
+            'notify_budget_alerts': self.notify_budget_alerts,
+            'monthly_limit': float(self.monthly_limit) if self.monthly_limit else 0
         }
