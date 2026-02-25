@@ -13,10 +13,26 @@ type Screen = 'dashboard' | 'add-expense' | 'statistics' | 'profile';
 type Tab = 'home' | 'add' | 'stats' | 'profile';
 
 function AppContent() {
-  const { isAuthenticated, loading } = useExpenses();
+  const { isAuthenticated, loading, refreshData } = useExpenses();
   const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [showRegister, setShowRegister] = useState(false);
+
+  // Handle Google OAuth redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('auth_success') === 'true') {
+      window.history.replaceState({}, '', window.location.pathname);
+      refreshData();
+    }
+
+    if (params.get('auth_error')) {
+      const error = params.get('auth_error');
+      console.error('Google auth error:', error);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   // Auth Flow
   useEffect(() => {

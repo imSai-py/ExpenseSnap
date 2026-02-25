@@ -4,6 +4,7 @@ Authentication routes.
 Handles user login, registration, logout, and OAuth flows
 with proper form validation and error handling.
 """
+import os
 from flask import Blueprint, render_template, redirect, url_for, flash, current_app, jsonify, request
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -21,46 +22,74 @@ def google_login():
     try:
         google = oauth.create_client('google')
         redirect_uri = url_for('auth.google_auth', _external=True)
+        current_app.logger.info(f"Google OAuth redirect URI: {redirect_uri}")
         return google.authorize_redirect(redirect_uri)
     except Exception as e:
         current_app.logger.error(f"Google login error: {e}")
-        flash('Unable to connect to Google. Please try again.', 'error')
-        return redirect(url_for('auth.login'))
+        frontend_url = _get_frontend_url()
+        return redirect(f"{frontend_url}?auth_error=google_unavailable")
 
 
 @auth.route('/auth/callback')
 def google_auth():
     """Handle Google OAuth callback."""
+    frontend_url = _get_frontend_url()
+
     try:
         google = oauth.create_client('google')
         token = google.authorize_access_token()
         user_info = token.get('userinfo')
 
-        if user_info:
-            email = user_info['email']
-            username = user_info.get('name', email.split('@')[0])
+        if not user_info:
+            current_app.logger.error("No userinfo in Google token")
+            return redirect(f"{frontend_url}?auth_error=no_user_info")
 
+        email = user_info['email']
+        google_id = user_info['sub']
+        name = user_info.get('name', email.split('@')[0])
+        picture = user_info.get('picture')
+
+        # 1. Check if user exists by google_id
+        user = User.query.filter_by(google_id=google_id).first()
+
+        if not user:
+            # 2. Check if user exists by email (link accounts)
             user = User.query.filter_by(email=email).first()
-            if not user:
+            if user:
+                user.google_id = google_id
+                current_app.logger.info(f"Linked Google account to existing user: {email}")
+            else:
+                # 3. Create new user with unique username
+                base_username = name.replace(' ', '_').lower()
+                username = base_username
+                counter = 1
+                while User.query.filter_by(username=username).first():
+                    username = f"{base_username}_{counter}"
+                    counter += 1
+
                 user = User(
                     username=username,
                     email=email,
+                    google_id=google_id,
                     preferred_currency='USD'
                 )
+                if picture:
+                    user.profile_photo = picture
                 db.session.add(user)
-                db.session.commit()
-                current_app.logger.info(f"New OAuth user registered: {email}")
+                current_app.logger.info(f"New Google OAuth user registered: {email}")
 
-            login_user(user)
-            current_app.logger.info(f"OAuth login successful: {email}")
-            return redirect(url_for('expenses.index'))
+        db.session.commit()
+        login_user(user)
+        current_app.logger.info(f"Google OAuth login successful: {email}")
+
+        return redirect(f"{frontend_url}?auth_success=true")
 
     except Exception as e:
         current_app.logger.error(f"Google auth callback error: {e}")
+        import traceback
+        current_app.logger.error(traceback.format_exc())
         db.session.rollback()
-        flash('Authentication failed. Please try again.', 'error')
-
-    return redirect(url_for('auth.login'))
+        return redirect(f"{frontend_url}?auth_error=callback_failed")
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -298,3 +327,15 @@ def check_auth():
         return jsonify({'authenticated': True, 'user': current_user.to_dict()})
     else:
         return jsonify({'authenticated': False}), 401
+
+
+def _get_frontend_url():
+    """Get the frontend URL based on environment."""
+    vercel_url = os.environ.get('VERCEL_FRONTEND_URL')
+    if vercel_url:
+        return vercel_url
+
+    if os.environ.get('FLASK_ENV') == 'production':
+        return 'https://expense-snap-chi.vercel.app'
+
+    return 'http://localhost:5173'

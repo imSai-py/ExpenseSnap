@@ -262,6 +262,13 @@ def _run_schema_migrations(app: Flask, db) -> None:
             db.session.commit()
             app.logger.info("Added monthly_limit column successfully")
 
+        # Add google_id if missing (for Google OAuth)
+        if 'google_id' not in existing_columns:
+            app.logger.info("Adding missing column: user.google_id")
+            db.session.execute(text('ALTER TABLE "user" ADD COLUMN google_id VARCHAR(255) UNIQUE'))
+            db.session.commit()
+            app.logger.info("Added google_id column successfully")
+
         # ---- EXPENSE TABLE MIGRATIONS ----
         expense_columns = [col['name'] for col in inspector.get_columns('expense')]
         app.logger.info(f"Existing expense columns: {expense_columns}")
