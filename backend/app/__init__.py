@@ -50,19 +50,18 @@ def create_app(config_name: Optional[str] = None) -> Flask:
         "http://localhost:5175",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:5000",
-        # Production origins - Render backend
+        # Production origins - Firebase
+        "https://expensesnap-a1995.web.app",
+        "https://expensesnap-a1995.firebaseapp.com",
+        # Legacy origins - Render/Vercel (keep for transition)
         "https://expensesnap-crp6.onrender.com",
-        "https://expensesnap.onrender.com",
-        # Production origins - Vercel frontend
         "https://expense-snap-chi.vercel.app",
-        "https://expensesnap.vercel.app",
-        "https://expense-snap.vercel.app",
     ]
 
-    # Also allow custom Vercel URLs from environment variable
-    vercel_url = os.environ.get('VERCEL_FRONTEND_URL')
-    if vercel_url:
-        allowed_origins.append(vercel_url)
+    # Also allow custom frontend URL from environment variable
+    frontend_url = os.environ.get('FRONTEND_URL')
+    if frontend_url:
+        allowed_origins.append(frontend_url)
 
     CORS(app, resources={
         r"/*": {
@@ -311,11 +310,11 @@ def _run_schema_migrations(app: Flask, db) -> None:
             db.session.commit()
             app.logger.info("✅ Database connection successful!")
             
-        except OperationalError as e:
+        except Exception as db_fallback_error:
             app.logger.error("=" * 60)
-            app.logger.error("❌ DATABASE CONNECTION FAILED!")
+            app.logger.error("DATABASE CONNECTION FAILED!")
             app.logger.error("=" * 60)
-            app.logger.error(str(e))
+            app.logger.error(str(db_fallback_error))
             # ... (truncated detailed error handling for brevity, keeping essential logging)
 
         except Exception as e:

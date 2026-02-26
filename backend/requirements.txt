@@ -1,3 +1,8 @@
+# Firebase
+firebase-functions>=0.4.0
+firebase-admin>=6.0.0
+
+# Flask & Extensions
 Flask
 Flask-SQLAlchemy
 Flask-Login
@@ -10,9 +15,13 @@ flask-cors
 pywebpush
 py-vapid
 flask-migrate
+
+# Supabase
+supabase
+
+# Utilities
 APScheduler
 pandas
 openpyxl
-gunicorn
 matplotlib
 reportlab

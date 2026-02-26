@@ -21,7 +21,15 @@ def google_login():
     """Initiate Google OAuth flow."""
     try:
         google = oauth.create_client('google')
-        redirect_uri = url_for('auth.google_auth', _external=True)
+
+        # In production (Firebase), url_for generates wrong scheme/path.
+        # Use FUNCTION_URL env var to build the correct redirect URI.
+        function_url = os.environ.get('FUNCTION_URL')
+        if function_url:
+            redirect_uri = f"{function_url.rstrip('/')}/auth/callback"
+        else:
+            redirect_uri = url_for('auth.google_auth', _external=True)
+
         current_app.logger.info(f"Google OAuth redirect URI: {redirect_uri}")
         return google.authorize_redirect(redirect_uri)
     except Exception as e:
@@ -331,11 +339,11 @@ def check_auth():
 
 def _get_frontend_url():
     """Get the frontend URL based on environment."""
-    vercel_url = os.environ.get('VERCEL_FRONTEND_URL')
-    if vercel_url:
-        return vercel_url
+    frontend_url = os.environ.get('FRONTEND_URL')
+    if frontend_url:
+        return frontend_url
 
     if os.environ.get('FLASK_ENV') == 'production':
-        return 'https://expense-snap-chi.vercel.app'
+        return 'https://expensesnap-a1995.web.app'
 
     return 'http://localhost:5173'

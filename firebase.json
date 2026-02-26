@@ -1,0 +1,50 @@
+{
+  "hosting": {
+    "public": "frontend/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "expensesnap"
+      },
+      {
+        "source": "/login/**",
+        "function": "expensesnap"
+      },
+      {
+        "source": "/register",
+        "function": "expensesnap"
+      },
+      {
+        "source": "/logout",
+        "function": "expensesnap"
+      },
+      {
+        "source": "/check-auth",
+        "function": "expensesnap"
+      },
+      {
+        "source": "/auth/**",
+        "function": "expensesnap"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "backend",
+      "codebase": "default",
+      "runtime": "python312",
+      "ignore": [
+        "venv",
+        "__pycache__",
+        "*.pyc",
+        ".env",
+        "logs"
+      ]
+    }
+  ]
+}
