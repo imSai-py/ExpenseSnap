@@ -19,6 +19,9 @@ flask-migrate
 # Supabase
 supabase
 
+# AI
+google-generativeai>=0.8.0
+
 # Utilities
 APScheduler
 pandas

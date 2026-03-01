@@ -76,6 +76,7 @@ class DevelopmentConfig(Config):
 
     DEBUG: bool = True
     SESSION_COOKIE_SECURE: bool = False  # Allow HTTP in development
+    SESSION_COOKIE_SAMESITE: str = 'Lax'  # Must be Lax (not None) when Secure=False
 
     @staticmethod
     def init_app(app) -> None:

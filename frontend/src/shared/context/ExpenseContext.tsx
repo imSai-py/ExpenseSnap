@@ -26,13 +26,12 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const refreshData = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const [expensesData, summaryData, userData] = await Promise.all([
         api.getExpenses(),
@@ -59,7 +58,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       }
       console.error('Error loading data:', err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, []);
 
@@ -184,7 +183,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
       expenses,
       summary,
       user,
-      loading,
+      loading: initialLoading,
       error,
       isAuthenticated,
       refreshData,

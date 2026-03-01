@@ -15,6 +15,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* SnapBot positioning — navbar is 70px on mobile, hidden on md+ */
+:root {
+  --navbar-height: 70px;
+}
+@media (min-width: 768px) {
+  :root {
+    --navbar-height: 0px;
+  }
+}
+
 .safe-area-top {
   padding-top: env(safe-area-inset-top);
 }

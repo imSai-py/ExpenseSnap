@@ -112,14 +112,17 @@ def create_app(config_name: Optional[str] = None) -> Flask:
     from app.features.auth.routes import auth
     from app.features.expenses.routes import expenses
     from app.features.expenses.api import api
+    from app.features.ai.routes import ai_bp
 
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(expenses, url_prefix='/')
     app.register_blueprint(api, url_prefix='/api')
+    app.register_blueprint(ai_bp, url_prefix='/api/ai')
     
     # Exempt API routes from CSRF
     csrf.exempt(api)
     csrf.exempt(auth)
+    csrf.exempt(ai_bp)
 
     # Register error handlers
     _register_error_handlers(app)
