@@ -9,6 +9,7 @@ import { Sidebar } from './shared/components/Sidebar';
 import { Login } from './features/auth/components/Login';
 import { Register } from './features/auth/components/Register';
 import { ChatBot } from './features/ai/ChatBot';
+import { InstallPrompt } from './shared/components/InstallPrompt';
 
 type Screen = 'dashboard' | 'add-expense' | 'statistics' | 'profile';
 type Tab = 'home' | 'add' | 'stats' | 'profile';
@@ -102,6 +103,7 @@ function AppContent() {
         </div>
       </div>
       <ChatBot />
+      <InstallPrompt />
     </div>
   );
 }

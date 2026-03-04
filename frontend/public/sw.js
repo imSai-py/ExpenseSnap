@@ -1,11 +1,20 @@
 /**
  * ExpenseSnap Service Worker
  *
- * Handles push notifications and caching for the PWA.
+ * Handles push notifications, offline caching, and PWA support.
  * This file must be in the public/ folder to be served at the root.
  */
 
-const CACHE_NAME = 'expensesnap-v6';
+const CACHE_NAME = 'expensesnap-v7';
+
+// Assets to pre-cache on install (app shell)
+const PRECACHE_ASSETS = [
+  '/',
+  '/manifest.json',
+  '/logo.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+];
 
 // ============================================================================
 // API URL Configuration - Dynamically detect production vs development
@@ -31,24 +40,199 @@ function getApiBaseUrl() {
 const API_BASE_URL = getApiBaseUrl();
 
 // ============================================================================
-// Installation
+// Caching Helpers
+// ============================================================================
+
+/**
+ * Check if a request is an API call.
+ */
+function isApiRequest(url) {
+  return url.pathname.startsWith('/api') ||
+    url.hostname.includes('onrender.com') ||
+    url.pathname.startsWith('/login') ||
+    url.pathname.startsWith('/register') ||
+    url.pathname.startsWith('/logout');
+}
+
+/**
+ * Check if a request is for a static asset that should be cached.
+ */
+function isStaticAsset(url) {
+  return url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|gif|webp|woff2?|ttf|eot|ico|json)$/) ||
+    url.hostname.includes('fonts.googleapis.com') ||
+    url.hostname.includes('fonts.gstatic.com');
+}
+
+/**
+ * Check if a request is a navigation request (HTML page).
+ */
+function isNavigationRequest(request) {
+  return request.mode === 'navigate';
+}
+
+// ============================================================================
+// Installation - Pre-cache app shell
 // ============================================================================
 
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
-  // Force new service worker to activate immediately
-  self.skipWaiting();
+  console.log('[SW] Installing service worker v7...');
+
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('[SW] Pre-caching app shell');
+        return cache.addAll(PRECACHE_ASSETS);
+      })
+      .then(() => {
+        // Force new service worker to activate immediately
+        return self.skipWaiting();
+      })
+      .catch((error) => {
+        console.error('[SW] Pre-cache failed:', error);
+        // Still skip waiting even if pre-cache fails
+        return self.skipWaiting();
+      })
+  );
 });
 
 // ============================================================================
-// Activation
+// Activation - Clean up old caches
 // ============================================================================
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Service worker activated');
-  // Take control of all clients immediately
-  event.waitUntil(clients.claim());
+  console.log('[SW] Service worker v7 activated');
+
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((name) => name !== CACHE_NAME)
+            .map((name) => {
+              console.log('[SW] Deleting old cache:', name);
+              return caches.delete(name);
+            })
+        );
+      })
+      .then(() => {
+        // Take control of all clients immediately
+        return clients.claim();
+      })
+  );
 });
+
+// ============================================================================
+// Fetch Handler - Dual Caching Strategy
+// ============================================================================
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Only handle GET requests for caching
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // Skip chrome-extension and other non-http(s) requests
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // ---- Strategy 1: Network First for API calls ----
+  if (isApiRequest(url)) {
+    event.respondWith(networkFirstStrategy(event.request));
+    return;
+  }
+
+  // ---- Strategy 2: Cache First for static assets ----
+  if (isStaticAsset(url)) {
+    event.respondWith(cacheFirstStrategy(event.request));
+    return;
+  }
+
+  // ---- Strategy 3: Network First for navigation (HTML pages) ----
+  if (isNavigationRequest(event.request)) {
+    event.respondWith(networkFirstStrategy(event.request));
+    return;
+  }
+
+  // Default: Network with cache fallback
+  event.respondWith(networkFirstStrategy(event.request));
+});
+
+/**
+ * Network First Strategy:
+ * Try the network first. If it succeeds, cache the response and return it.
+ * If the network fails, return the cached version (if available).
+ */
+async function networkFirstStrategy(request) {
+  try {
+    const networkResponse = await fetch(request);
+
+    // Only cache successful responses
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      // Clone the response because it can only be consumed once
+      cache.put(request, networkResponse.clone());
+    }
+
+    return networkResponse;
+  } catch (error) {
+    console.log('[SW] Network failed, trying cache for:', request.url);
+
+    const cachedResponse = await caches.match(request);
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // For navigation requests, return the cached index.html (SPA fallback)
+    if (request.mode === 'navigate') {
+      const fallback = await caches.match('/');
+      if (fallback) {
+        return fallback;
+      }
+    }
+
+    // Nothing in cache either - return a basic offline response
+    return new Response('Offline - Please check your connection', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+}
+
+/**
+ * Cache First Strategy:
+ * Check the cache first. If found, return the cached response.
+ * If not cached, fetch from network, cache it, and return.
+ */
+async function cacheFirstStrategy(request) {
+  const cachedResponse = await caches.match(request);
+
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  try {
+    const networkResponse = await fetch(request);
+
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+
+    return networkResponse;
+  } catch (error) {
+    console.log('[SW] Cache miss and network failed for:', request.url);
+
+    return new Response('', {
+      status: 503,
+      statusText: 'Service Unavailable',
+    });
+  }
+}
 
 // ============================================================================
 // Push Notification Handler
@@ -65,8 +249,8 @@ function parsePushData(event) {
   const defaults = {
     title: 'ExpenseSnap',
     body: 'You have a new notification',
-    icon: '/vite.svg',
-    badge: '/vite.svg',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-192x192.png',
     data: { url: '/' }
   };
 
@@ -236,26 +420,26 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       userVisibleOnly: true,
       applicationServerKey: event.oldSubscription?.options?.applicationServerKey
     })
-    .then((newSubscription) => {
-      // Send the new subscription to the server using dynamic API URL
-      return fetch(`${API_BASE_URL}/push/subscribe`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newSubscription.toJSON()),
-        credentials: 'include'
-      });
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to update subscription on server');
-      }
-      console.log('[SW] Subscription updated on server');
-    })
-    .catch((error) => {
-      console.error('[SW] Error updating subscription:', error);
-    })
+      .then((newSubscription) => {
+        // Send the new subscription to the server using dynamic API URL
+        return fetch(`${API_BASE_URL}/push/subscribe`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newSubscription.toJSON()),
+          credentials: 'include'
+        });
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to update subscription on server');
+        }
+        console.log('[SW] Subscription updated on server');
+      })
+      .catch((error) => {
+        console.error('[SW] Error updating subscription:', error);
+      })
   );
 });
 
