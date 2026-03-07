@@ -45,44 +45,57 @@ def chat():
     expense_added = None
 
     try:
-        # Step 1: Try to parse as an expense entry
-        parsed = ai_service.parse_expense(message)
+        # Step 1: Try to parse as expense entries (may return multiple)
+        parsed_list = ai_service.parse_expense(message)
 
-        if parsed:
-            # Create the expense in the database
-            new_expense = Expense(
-                item_name=parsed['item_name'],
-                amount=Decimal(str(parsed['amount'])),
-                currency=parsed['currency'],
-                category=parsed['category'],
-                type=parsed.get('type', 'expense'),
-                user_id=current_user.id
-            )
+        if parsed_list:
+            added_expenses = []
+            reply_lines = []
 
-            db.session.add(new_expense)
+            for parsed in parsed_list:
+                new_expense = Expense(
+                    item_name=parsed['item_name'],
+                    amount=Decimal(str(parsed['amount'])),
+                    currency=parsed['currency'],
+                    category=parsed['category'],
+                    type=parsed.get('type', 'expense'),
+                    user_id=current_user.id
+                )
+                db.session.add(new_expense)
+                db.session.flush()  # Get the ID before commit
+
+                added_expenses.append(new_expense.to_dict())
+                symbol = CURRENCY_SYMBOLS.get(parsed['currency'], '$')
+
+                entry_type = 'income' if parsed.get('type') == 'income' else 'expense'
+                if entry_type == 'income':
+                    reply_lines.append(
+                        f"💰 **{parsed['item_name']}** — {symbol}{parsed['amount']:,.2f} "
+                        f"({parsed['category']})"
+                    )
+                else:
+                    reply_lines.append(
+                        f"📝 **{parsed['item_name']}** — {symbol}{parsed['amount']:,.2f} "
+                        f"({parsed['category']})"
+                    )
+
             db.session.commit()
 
-            expense_added = new_expense.to_dict()
-            symbol = CURRENCY_SYMBOLS.get(parsed['currency'], '$')
-
-            entry_type = 'income' if parsed.get('type') == 'income' else 'expense'
-            if entry_type == 'income':
-                reply = (
-                    f"✅ Got it! I've recorded your income:\n"
-                    f"💰 **{parsed['item_name']}** — {symbol}{parsed['amount']:,.2f} "
-                    f"({parsed['category']})"
-                )
+            if len(added_expenses) == 1:
+                entry_type = added_expenses[0].get('type', 'expense')
+                prefix = "income" if entry_type == 'income' else "expense"
+                reply = f"✅ Got it! I've added your {prefix}:\n{reply_lines[0]}"
             else:
-                reply = (
-                    f"✅ Got it! I've added your expense:\n"
-                    f"📝 **{parsed['item_name']}** — {symbol}{parsed['amount']:,.2f} "
-                    f"({parsed['category']})"
-                )
+                reply = f"✅ Got it! I've added **{len(added_expenses)} entries**:\n" + "\n".join(reply_lines)
 
             current_app.logger.info(
-                f"SnapBot added {entry_type}: {parsed['item_name']} "
+                f"SnapBot added {len(added_expenses)} entry/entries "
                 f"for user {current_user.id}"
             )
+
+            # Return the first expense for the card display (backward compat),
+            # plus the full list
+            expense_added = added_expenses[0]
 
         else:
             # Step 2: Not an expense — treat as a general question

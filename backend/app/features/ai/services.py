@@ -77,15 +77,15 @@ User's message: {message}"""
             logger.error(f"AI chat error: {e}")
             return "Sorry, I'm having trouble right now. Please try again in a moment. 😅"
 
-    def parse_expense(self, message: str) -> Optional[Dict[str, Any]]:
+    def parse_expense(self, message: str) -> Optional[List[Dict[str, Any]]]:
         """
-        Try to parse an expense from a natural language message.
+        Try to parse one or more expenses from a natural language message.
 
         Args:
-            message: User's message (e.g., "spent 200 on uber")
+            message: User's message (e.g., "spent 200 on uber and 500 on groceries")
 
         Returns:
-            Dict with expense data if parsed, None if not an expense
+            List of dicts with expense data if parsed, None if no expenses found
         """
         try:
             _, parse_model = self._get_model()
@@ -102,26 +102,35 @@ User's message: {message}"""
 
             parsed = json.loads(text)
 
-            if not parsed.get('is_expense', False):
+            if not parsed.get('has_expenses', False):
                 return None
 
-            # Validate required fields
+            expenses_raw = parsed.get('expenses', [])
+            if not expenses_raw:
+                return None
+
+            validated = []
             required = ['item_name', 'amount', 'currency', 'category', 'type']
-            if not all(parsed.get(k) for k in required):
-                return None
 
-            # Validate amount is positive
-            amount = float(parsed['amount'])
-            if amount <= 0:
-                return None
+            for entry in expenses_raw:
+                # Validate required fields
+                if not all(entry.get(k) for k in required):
+                    continue
 
-            return {
-                'item_name': str(parsed['item_name']).strip()[:100],
-                'amount': amount,
-                'currency': parsed['currency'],
-                'category': parsed['category'],
-                'type': parsed.get('type', 'expense'),
-            }
+                # Validate amount is positive
+                amount = float(entry['amount'])
+                if amount <= 0:
+                    continue
+
+                validated.append({
+                    'item_name': str(entry['item_name']).strip()[:100],
+                    'amount': amount,
+                    'currency': entry['currency'],
+                    'category': entry['category'],
+                    'type': entry.get('type', 'expense'),
+                })
+
+            return validated if validated else None
 
         except (json.JSONDecodeError, ValueError) as e:
             logger.debug(f"Expense parse failed (not an expense): {e}")
