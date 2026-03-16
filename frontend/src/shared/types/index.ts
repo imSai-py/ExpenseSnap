@@ -133,3 +133,23 @@ export interface NotificationHistoryResponse {
   notifications: NotificationHistoryItem[];
   unread_count: number;
 }
+
+// Receipt OCR Types
+export interface ReceiptItem {
+  item_name: string;
+  amount: number;
+  category: string;
+  type: 'expense' | 'income';
+}
+
+export interface ReceiptScanResult {
+  success: boolean;
+  error?: string;
+  merchant?: string;
+  date?: string;
+  currency?: string;
+  items?: ReceiptItem[];
+  total?: number;
+  confidence?: 'high' | 'medium' | 'low';
+  item_count?: number;
+}

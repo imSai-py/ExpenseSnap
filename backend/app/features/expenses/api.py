@@ -657,6 +657,94 @@ def import_expenses():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ============================================================================
+# Receipt OCR / Scan Endpoint
+# ============================================================================
+
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'}
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB for receipt images
+
+
+def allowed_image_file(filename):
+    """Check if file extension is allowed for receipt scanning."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+
+@api.route('/scan-receipt', methods=['POST'])
+@login_required
+def scan_receipt():
+    """Scan a receipt image and extract expense data using OCR.
+
+    Accepts multipart/form-data with:
+        - receipt: Image file (jpg, jpeg, png, webp, heic, heif)
+
+    Returns parsed expense data from the receipt.
+    """
+    try:
+        if 'receipt' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No receipt image uploaded'
+            }), 400
+
+        file = request.files['receipt']
+
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No file selected'
+            }), 400
+
+        if not allowed_image_file(file.filename):
+            return jsonify({
+                'success': False,
+                'error': 'Invalid file type. Allowed: JPG, PNG, WebP, HEIC'
+            }), 400
+
+        # Check file size
+        file.seek(0, 2)
+        file_size = file.tell()
+        file.seek(0)
+
+        if file_size > MAX_IMAGE_SIZE:
+            return jsonify({
+                'success': False,
+                'error': 'Image too large. Maximum size is 10MB'
+            }), 400
+
+        # Determine MIME type
+        file_ext = file.filename.rsplit('.', 1)[1].lower()
+        mime_types = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'webp': 'image/webp',
+            'heic': 'image/heic',
+            'heif': 'image/heif',
+        }
+        mime_type = mime_types.get(file_ext, 'image/jpeg')
+
+        # Read image data
+        image_data = file.read()
+
+        # Process with OCR service
+        from .ocr_service import receipt_ocr_service
+        result = receipt_ocr_service.scan_receipt(image_data, mime_type)
+
+        if result.get('success'):
+            current_app.logger.info(
+                f'User {current_user.id} scanned receipt: '
+                f'{result.get("item_count", 0)} items from {result.get("merchant", "Unknown")}'
+            )
+
+        return jsonify(result)
+
+    except Exception as e:
+        current_app.logger.error(f'Error scanning receipt: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @api.route('/summary', methods=['GET'])
 @login_required
 def get_summary():

@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useExpenses } from '../../../shared/context/ExpenseContext';
 import { TopAppBar } from '../../../shared/components/TopAppBar';
-import { ChevronDown, FileSpreadsheet, Calendar } from 'lucide-react';
+import { ChevronDown, FileSpreadsheet, Calendar, ScanLine } from 'lucide-react';
 import { BulkImport } from './BulkImport';
+import { ReceiptScanner } from './ReceiptScanner';
 
 interface AddExpenseProps {
   onBack: () => void;
 }
 
-type AddMode = 'single' | 'bulk';
+type AddMode = 'single' | 'scan' | 'bulk';
 
 // Helper to get today's date in YYYY-MM-DD format
 const getTodayDate = () => {
@@ -62,11 +63,27 @@ export function AddExpense({ onBack }: AddExpenseProps) {
     }
   };
 
+  const getModeTitle = () => {
+    switch (mode) {
+      case 'scan': return 'Scan Receipt';
+      case 'bulk': return 'Bulk Import';
+      default: return type === 'income' ? 'Add Income' : 'Add Expense';
+    }
+  };
+
+  const getModeSubtitle = () => {
+    switch (mode) {
+      case 'scan': return 'Scan a receipt to auto-fill expense details.';
+      case 'bulk': return 'Import multiple expenses from a CSV or Excel file.';
+      default: return `Track your financials by adding a new ${type}.`;
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-[#F9FAFB]">
       <div className="md:hidden">
         <TopAppBar
-          title={mode === 'bulk' ? 'Bulk Import' : (type === 'income' ? 'Add Income' : 'Add Expense')}
+          title={getModeTitle()}
           showBackButton={true}
           onBackClick={onBack}
         />
@@ -74,19 +91,15 @@ export function AddExpense({ onBack }: AddExpenseProps) {
       <div className="hidden md:block bg-white px-8 py-6 border-b border-[#E5E7EB]">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-semibold text-[#111827]">
-            {mode === 'bulk' ? 'Bulk Import Expenses' : `Add New ${type === 'income' ? 'Income' : 'Expense'}`}
+            {mode === 'bulk' ? 'Bulk Import Expenses' : mode === 'scan' ? 'Scan Receipt' : `Add New ${type === 'income' ? 'Income' : 'Expense'}`}
           </h1>
-          <p className="text-[#6B7280] mt-1">
-            {mode === 'bulk'
-              ? 'Import multiple expenses from a CSV or Excel file.'
-              : `Track your financials by adding a new ${type}.`}
-          </p>
+          <p className="text-[#6B7280] mt-1">{getModeSubtitle()}</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto pb-24 md:pb-8">
         <div className="max-w-md md:max-w-4xl mx-auto px-4 md:px-8 py-6">
 
-          {/* Mode Toggle - Single vs Bulk */}
+          {/* Mode Toggle - Single vs Scan vs Bulk */}
           <div className="flex justify-center mb-6">
             <div className="bg-white p-1 rounded-xl border border-[#E5E7EB] flex shadow-sm">
               <button
@@ -99,6 +112,16 @@ export function AddExpense({ onBack }: AddExpenseProps) {
                 <span>Single</span>
               </button>
               <button
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${mode === 'scan'
+                  ? 'bg-[#4F46E5] text-white shadow-sm'
+                  : 'text-[#6B7280] hover:bg-[#F3F4F6]'
+                  }`}
+                onClick={() => setMode('scan')}
+              >
+                <ScanLine className="w-4 h-4" />
+                <span>Scan</span>
+              </button>
+              <button
                 className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${mode === 'bulk'
                   ? 'bg-[#4F46E5] text-white shadow-sm'
                   : 'text-[#6B7280] hover:bg-[#F3F4F6]'
@@ -106,12 +129,19 @@ export function AddExpense({ onBack }: AddExpenseProps) {
                 onClick={() => setMode('bulk')}
               >
                 <FileSpreadsheet className="w-4 h-4" />
-                <span>Bulk Import</span>
+                <span>Bulk</span>
               </button>
             </div>
           </div>
 
-          {mode === 'bulk' ? (
+          {mode === 'scan' ? (
+            /* Receipt Scanner Mode */
+            <ReceiptScanner
+              onComplete={onBack}
+              currencySymbol={currencySymbol}
+              currencyCode={currencyCode}
+            />
+          ) : mode === 'bulk' ? (
             /* Bulk Import Mode */
             <BulkImport onComplete={onBack} onCancel={() => setMode('single')} />
           ) : (

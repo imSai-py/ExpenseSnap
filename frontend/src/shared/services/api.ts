@@ -1,4 +1,4 @@
-import type { Expense, ExpenseSummary, User, ProfileUpdateData, NotificationPreferences, ChangePasswordData, ImportPreviewResult, ImportResult, ExpenseFilters, NotificationHistoryItem, NotificationHistoryResponse } from '../types';
+import type { Expense, ExpenseSummary, User, ProfileUpdateData, NotificationPreferences, ChangePasswordData, ImportPreviewResult, ImportResult, ExpenseFilters, NotificationHistoryItem, NotificationHistoryResponse, ReceiptScanResult } from '../types';
 
 /**
  * Determine the API base URL based on environment
@@ -465,4 +465,26 @@ export const api = {
     const data = await parseJsonResponse(response);
     if (!data.success) throw new Error(data.error || 'Failed to delete notification');
   },
+
+  // ============================================================================
+  // Receipt OCR / Scan Methods
+  // ============================================================================
+
+  async scanReceipt(file: File): Promise<ReceiptScanResult> {
+    const formData = new FormData();
+    formData.append('receipt', file);
+
+    const response = await fetch(`${API_BASE_URL}/scan-receipt`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    return data;
+  },
 };
+
