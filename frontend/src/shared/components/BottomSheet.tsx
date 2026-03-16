@@ -62,26 +62,30 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
               stiffness: 300,
               mass: 0.8
             }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[101] max-h-[85vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 rounded-t-3xl z-[101] max-h-[85vh] overflow-hidden"
+            style={{ backgroundColor: 'var(--color-bg-card)' }}
             role="dialog"
             aria-modal="true"
             aria-label={title || 'Bottom sheet menu'}
           >
             {/* Drag handle indicator */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-[#E5E7EB] rounded-full" />
+              <div className="w-10 h-1 rounded-full" style={{ backgroundColor: 'var(--color-border)' }} />
             </div>
 
             {/* Header with title and close button */}
             {title && (
-              <div className="flex items-center justify-between px-5 pb-3 border-b border-[#F3F4F6]">
-                <h2 className="text-lg font-semibold text-[#111827]">{title}</h2>
+              <div className="flex items-center justify-between px-5 pb-3 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{title}</h2>
                 <button
                   onClick={onClose}
-                  className="p-2 -mr-2 rounded-full hover:bg-[#F3F4F6] transition-colors"
+                  className="p-2 -mr-2 rounded-full transition-colors"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   aria-label="Close menu"
                 >
-                  <X className="w-5 h-5 text-[#6B7280]" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             )}

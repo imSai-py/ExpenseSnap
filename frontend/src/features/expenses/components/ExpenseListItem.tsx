@@ -43,9 +43,9 @@ export function ExpenseListItem({
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isExpense = type === 'expense';
-  const iconBgClass = isExpense ? 'bg-[#FEF2F2]' : 'bg-[#F0FDF4]';
-  const iconColorClass = isExpense ? 'text-[#DC2626]' : 'text-[#16A34A]';
-  const amountColorClass = isExpense ? 'text-[#DC2626]' : 'text-[#16A34A]';
+  const iconBgClass = isExpense ? 'bg-[var(--color-danger-bg)]' : 'bg-[var(--color-success-bg)]';
+  const iconColorClass = isExpense ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]';
+  const amountColorClass = isExpense ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]';
   const prefix = isExpense ? '-' : '+';
 
   // Calculate menu position when opening
@@ -203,11 +203,13 @@ export function ExpenseListItem({
   const dropdownMenu = isMenuOpen && createPortal(
     <div
       ref={menuRef}
-      className="fixed w-44 bg-white rounded-xl shadow-xl border border-[#E5E7EB] py-1.5 animate-fade-in"
+      className="fixed w-44 rounded-xl shadow-xl border py-1.5 animate-fade-in"
       style={{
         top: menuPosition.top,
         left: menuPosition.left,
         zIndex: 9999,
+        backgroundColor: 'var(--color-bg-card)',
+        borderColor: 'var(--color-border)'
       }}
       onClick={(e) => e.stopPropagation()}
       role="menu"
@@ -215,17 +217,23 @@ export function ExpenseListItem({
       {onEdit && (
         <button
           onClick={handleEditClick}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-[#374151] hover:bg-[#F9FAFB] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors"
+          style={{ color: 'var(--color-text-primary)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           role="menuitem"
         >
-          <Pencil className="w-4 h-4 text-[#6B7280]" />
+          <Pencil className="w-4 h-4" style={{ color: 'var(--color-text-secondary)' }} />
           <span>Edit</span>
         </button>
       )}
       {onDelete && (
         <button
           onClick={handleDeleteClick}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-[#DC2626] hover:bg-[#FEF2F2] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors"
+          style={{ color: 'var(--color-danger)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-bg)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           role="menuitem"
         >
           <Trash2 className="w-4 h-4" />
@@ -237,13 +245,17 @@ export function ExpenseListItem({
   );
 
   return (
-    <div className="flex items-center gap-3 py-3 md:py-4 hover:bg-[#F9FAFB] md:px-3 md:-mx-3 rounded-lg transition-colors group">
+    <div 
+      className="flex items-center gap-3 py-3 md:py-4 md:px-3 md:-mx-3 rounded-lg transition-colors group"
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+    >
       <div className={'w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ' + iconBgClass}>
         <Icon className={'w-6 h-6 md:w-7 md:h-7 ' + iconColorClass} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[#111827] font-medium md:text-lg truncate">{title}</p>
-        <p className="text-[#6B7280] text-xs md:text-sm mt-0.5">{date} - {category}</p>
+        <p className="font-medium md:text-lg truncate" style={{ color: 'var(--color-text-primary)' }}>{title}</p>
+        <p className="text-xs md:text-sm mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>{date} - {category}</p>
       </div>
 
       {/* Amount and Actions Container */}
@@ -260,7 +272,10 @@ export function ExpenseListItem({
           <div className="flex items-center gap-2 animate-fade-in">
             <button
               onClick={handleCancelDelete}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#F3F4F6] text-[#374151] hover:bg-[#E5E7EB] transition-colors"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-border)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)'}
               disabled={isDeleting}
             >
               Cancel
@@ -268,7 +283,8 @@ export function ExpenseListItem({
             <button
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#DC2626] text-white hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg text-white transition-colors disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-danger)' }}
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
@@ -280,12 +296,10 @@ export function ExpenseListItem({
           <button
             ref={buttonRef}
             onClick={handleMenuToggle}
-            className={`p-2 rounded-lg transition-all duration-150 ${isMenuOpen
-                ? 'bg-[#F3F4F6] text-[#111827] opacity-100'
-                : isMobile
-                  ? 'text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827] opacity-100'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827] opacity-0 group-hover:opacity-100'
-              }`}
+            className={`p-2 rounded-lg transition-all duration-150 ${isMenuOpen ? 'opacity-100' : isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+            style={isMenuOpen ? { backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)' } : { color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => { if (!isMenuOpen) { e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)'; e.currentTarget.style.color = 'var(--color-text-primary)'; } }}
+            onMouseLeave={(e) => { if (!isMenuOpen) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; } }}
             title="More options"
             aria-expanded={isMenuOpen || isActionSheetOpen}
             aria-haspopup="true"

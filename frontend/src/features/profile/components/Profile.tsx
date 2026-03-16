@@ -5,6 +5,7 @@ import { EditProfileModal } from './EditProfileModal';
 import { NotificationsSettings } from '../../settings/components/NotificationsSettings';
 import { PrivacySecuritySettings } from '../../settings/components/PrivacySecuritySettings';
 import { HelpSupportSettings } from '../../settings/components/HelpSupportSettings';
+import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 
 const CURRENCIES = [
   { code: 'USD', symbol: '$', name: 'US Dollar' },
@@ -73,23 +74,23 @@ export function Profile() {
 
   return (
     <>
-      <div className="flex flex-col h-screen bg-[#F9FAFB]">
+      <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
         <div className="flex-1 overflow-y-auto pb-24 md:pb-8">
-          <div className="bg-white px-4 py-6 shadow-sm md:hidden">
+          <div className="px-4 py-6 shadow-sm md:hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
             <div className="max-w-md mx-auto">
-              <h1 className="text-2xl font-semibold text-[#111827]">Profile</h1>
+              <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Profile</h1>
             </div>
           </div>
-          <div className="hidden md:block bg-white px-8 py-6 border-b border-[#E5E7EB]">
+          <div className="hidden md:block px-8 py-6 border-b" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-3xl font-semibold text-[#111827]">Profile & Settings</h1>
-              <p className="text-[#6B7280] mt-1">Manage your account and preferences.</p>
+              <h1 className="text-3xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Profile & Settings</h1>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Manage your account and preferences.</p>
             </div>
           </div>
           <div className="max-w-md md:max-w-4xl mx-auto px-4 md:px-8 py-6 space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: 'var(--color-bg-card)' }}>
               <div className="flex items-center gap-4 md:gap-6">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-[#4F46E5] flex items-center justify-center">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
                   {user?.profile_photo ? (
                     <img
                       src={user.profile_photo}
@@ -101,9 +102,9 @@ export function Profile() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl md:text-2xl font-semibold text-[#111827]">{user?.username || 'User'}</h2>
+                  <h2 className="text-xl md:text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>{user?.username || 'User'}</h2>
                   {user?.email && (
-                    <div className="flex items-center gap-2 mt-1 text-[#6B7280] text-sm">
+                    <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                       <Mail className="w-4 h-4" />
                       <span>{user.email}</span>
                     </div>
@@ -111,7 +112,8 @@ export function Profile() {
                   <div className="mt-2 relative">
                     <button
                       onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}
-                      className="flex items-center gap-1 text-xs bg-[#EEF2FF] text-[#4F46E5] px-3 py-1.5 rounded-full hover:bg-[#E0E7FF] transition-colors"
+                      className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full transition-colors"
+                      style={{ backgroundColor: 'var(--color-brand-bg)', color: 'var(--color-brand)' }}
                     >
                       <span>{currentCurrency.symbol} {currentCurrency.code}</span>
                       <ChevronDown className="w-3 h-3" />
@@ -144,29 +146,33 @@ export function Profile() {
                 </div>
                 <button
                   onClick={() => setShowEditProfile(true)}
-                  className="hidden md:block px-4 py-2 bg-[#4F46E5] text-white rounded-xl font-medium hover:bg-[#4338CA] transition-colors"
+                    className="hidden md:block px-4 py-2 text-white rounded-xl font-medium transition-colors"
+                    style={{ backgroundColor: 'var(--color-brand)' }}
                 >
                   Edit
                 </button>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 md:gap-4">
-              <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm text-center">
-                <p className="text-2xl md:text-3xl font-semibold text-[#4F46E5]">{user?.total_expenses || expenses.length}</p>
-                <p className="text-xs md:text-sm text-[#6B7280] mt-1">Total Expenses</p>
+              <div className="rounded-2xl p-4 md:p-6 shadow-sm text-center" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+                <p className="text-2xl md:text-3xl font-semibold" style={{ color: 'var(--color-brand)' }}>{user?.total_expenses || expenses.length}</p>
+                <p className="text-xs md:text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Total Expenses</p>
               </div>
-              <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm text-center">
-                <p className="text-2xl md:text-3xl font-semibold text-[#16A34A]">{expenses.length}</p>
-                <p className="text-xs md:text-sm text-[#6B7280] mt-1">This Month</p>
+              <div className="rounded-2xl p-4 md:p-6 shadow-sm text-center" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+                <p className="text-2xl md:text-3xl font-semibold" style={{ color: 'var(--color-success)' }}>{expenses.length}</p>
+                <p className="text-xs md:text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>This Month</p>
               </div>
-              <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm text-center">
-                <p className="text-2xl md:text-3xl font-semibold text-[#F59E0B]">{uniqueCategories}</p>
-                <p className="text-xs md:text-sm text-[#6B7280] mt-1">Categories</p>
+              <div className="rounded-2xl p-4 md:p-6 shadow-sm text-center" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+                <p className="text-2xl md:text-3xl font-semibold" style={{ color: 'var(--color-warning)' }}>{uniqueCategories}</p>
+                <p className="text-xs md:text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Categories</p>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#F3F4F6]">
-                <h3 className="text-lg font-semibold text-[#111827]">Settings</h3>
+            {/* Appearance / Theme Toggle */}
+            <ThemeToggle variant="full" />
+
+            <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+              <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Settings</h3>
               </div>
               <div className="divide-y divide-[#F3F4F6]">
                 {settingsItems.map((item) => {
@@ -175,16 +181,18 @@ export function Profile() {
                     <button
                       key={item.label}
                       onClick={item.onClick}
-                      className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[#F9FAFB] transition-colors"
+                      className="w-full flex items-center gap-4 px-6 py-4 transition-colors"
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      <div className="w-10 h-10 bg-[#F3F4F6] rounded-xl flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-[#6B7280]" />
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
+                        <Icon className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
                       </div>
                       <div className="flex-1 text-left">
-                        <p className="text-[#111827] font-medium">{item.label}</p>
-                        <p className="text-[#6B7280] text-sm mt-0.5 hidden md:block">{item.description}</p>
+                        <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{item.label}</p>
+                        <p className="text-sm mt-0.5 hidden md:block" style={{ color: 'var(--color-text-secondary)' }}>{item.description}</p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                      <ChevronRight className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
                     </button>
                   );
                 })}
@@ -192,14 +200,15 @@ export function Profile() {
             </div>
             <button
               onClick={logout}
-              className="w-full bg-white border border-[#E5E7EB] rounded-2xl px-6 py-4 flex items-center justify-center gap-2 text-[#DC2626] font-semibold hover:bg-[#FEF2F2] transition-colors shadow-sm"
+              className="w-full border rounded-2xl px-6 py-4 flex items-center justify-center gap-2 font-semibold transition-colors shadow-sm"
+              style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-danger)' }}
             >
               <LogOut className="w-5 h-5" />
               Logout
             </button>
             <div className="text-center py-4">
-              <p className="text-[#6B7280] text-sm">ExpenseSnap v1.0.0</p>
-              <p className="text-[#9CA3AF] text-xs mt-1">2026 ExpenseSnap. All rights reserved.</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>ExpenseSnap v1.0.0</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>2026 ExpenseSnap. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -213,21 +222,21 @@ export function Profile() {
 
       {/* Notifications Settings */}
       {showNotifications && (
-        <div className="fixed inset-0 z-50 bg-[#F9FAFB]">
+        <div className="fixed inset-0 z-50" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
           <NotificationsSettings onClose={() => setShowNotifications(false)} />
         </div>
       )}
 
       {/* Privacy & Security Settings */}
       {showPrivacySecurity && (
-        <div className="fixed inset-0 z-50 bg-[#F9FAFB]">
+        <div className="fixed inset-0 z-50" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
           <PrivacySecuritySettings onClose={() => setShowPrivacySecurity(false)} />
         </div>
       )}
 
       {/* Help & Support Settings */}
       {showHelpSupport && (
-        <div className="fixed inset-0 z-50 bg-[#F9FAFB]">
+        <div className="fixed inset-0 z-50" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
           <HelpSupportSettings onClose={() => setShowHelpSupport(false)} />
         </div>
       )}

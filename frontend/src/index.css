@@ -4,6 +4,125 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ============================================================================
+   Design Tokens — Light / Dark Mode
+   All component colors reference these variables.
+   ============================================================================ */
+
+:root {
+  /* Backgrounds */
+  --color-bg-primary: #F9FAFB;
+  --color-bg-card: #FFFFFF;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-input: #F9FAFB;
+  --color-bg-hover: #F3F4F6;
+  --color-bg-subtle: #F3F4F6;
+
+  /* Text */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+
+  /* Borders */
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* Brand / Accent */
+  --color-brand: #4F46E5;
+  --color-brand-hover: #4338CA;
+  --color-brand-bg: #EEF2FF;
+  --color-brand-bg-hover: #E0E7FF;
+  --color-brand-soft: #F5F3FF;
+
+  /* Status colors */
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-bg-hover: #FEE2E2;
+  --color-warning: #F59E0B;
+
+  /* Shadows */
+  --color-shadow: rgba(0, 0, 0, 0.05);
+  --color-shadow-md: rgba(0, 0, 0, 0.1);
+  --color-shadow-brand: rgba(79, 70, 229, 0.2);
+
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Chat */
+  --color-chat-bot-bg: #F3F4F6;
+  --color-chat-bot-text: #1F2937;
+  --color-chat-input-bg: #F9FAFB;
+
+  --navbar-height: 70px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --navbar-height: 0px;
+  }
+}
+
+/* ============================================================================
+   Dark Mode Overrides
+   ============================================================================ */
+
+.dark {
+  /* Backgrounds */
+  --color-bg-primary: #0F172A;
+  --color-bg-card: #1E293B;
+  --color-bg-elevated: #1E293B;
+  --color-bg-input: #1E293B;
+  --color-bg-hover: #334155;
+  --color-bg-subtle: #334155;
+
+  /* Text */
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-tertiary: #64748B;
+  --color-text-inverse: #FFFFFF;
+
+  /* Borders */
+  --color-border: #334155;
+  --color-border-light: #1E293B;
+  --color-divider: #334155;
+
+  /* Brand / Accent */
+  --color-brand: #818CF8;
+  --color-brand-hover: #6366F1;
+  --color-brand-bg: rgba(129, 140, 248, 0.15);
+  --color-brand-bg-hover: rgba(129, 140, 248, 0.25);
+  --color-brand-soft: rgba(129, 140, 248, 0.1);
+
+  /* Status colors */
+  --color-success: #22C55E;
+  --color-success-bg: rgba(34, 197, 94, 0.15);
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.15);
+  --color-danger-bg-hover: rgba(239, 68, 68, 0.25);
+  --color-warning: #FBBF24;
+
+  /* Shadows */
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-md: rgba(0, 0, 0, 0.4);
+  --color-shadow-brand: rgba(129, 140, 248, 0.3);
+
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Chat */
+  --color-chat-bot-bg: #334155;
+  --color-chat-bot-text: #E2E8F0;
+  --color-chat-input-bg: #1E293B;
+}
+
+/* ============================================================================
+   Global Styles
+   ============================================================================ */
+
 * {
   box-sizing: border-box;
 }
@@ -13,16 +132,9 @@ body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* SnapBot positioning — navbar is 70px on mobile, hidden on md+ */
-:root {
-  --navbar-height: 70px;
-}
-@media (min-width: 768px) {
-  :root {
-    --navbar-height: 0px;
-  }
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .safe-area-top {
@@ -33,14 +145,13 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Animation classes for modals and transitions */
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slide-up {
@@ -64,37 +175,17 @@ body {
 
 /* Receipt Scanner Animations */
 @keyframes scan-line {
-  0% {
-    top: 10%;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    top: 90%;
-    opacity: 0;
-  }
+  0% { top: 10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
 }
 
 @keyframes bounce-in {
-  0% {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  70% {
-    transform: scale(0.95);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .animate-scan-line {

@@ -1,6 +1,6 @@
 import { House, Plus, ChartBar, User, Wallet } from 'lucide-react';
-
 import { useExpenses } from '../context/ExpenseContext';
+import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
   activeTab: 'home' | 'add' | 'stats' | 'profile';
@@ -19,13 +19,19 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const initials = user?.username?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <div className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:bottom-0 md:w-64 bg-white border-r border-[#E5E7EB]">
-      <div className="p-6 border-b border-[#E5E7EB]">
+    <div
+      className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:bottom-0 md:w-64 border-r"
+      style={{
+        backgroundColor: 'var(--color-bg-card)',
+        borderColor: 'var(--color-border)',
+      }}
+    >
+      <div className="p-6 border-b" style={{ borderColor: 'var(--color-border)' }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#4F46E5] rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
             <Wallet className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-xl font-semibold text-[#111827]">ExpenseSnap</h1>
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>ExpenseSnap</h1>
         </div>
       </div>
       <nav className="flex-1 p-4">
@@ -33,13 +39,28 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            const activeClasses = 'bg-[#4F46E5] text-white shadow-lg shadow-[#4F46E5]/20';
-            const inactiveClasses = 'text-[#6B7280] hover:bg-[#F3F4F6]';
             return (
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ' + (isActive ? activeClasses : inactiveClasses)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: 'var(--color-brand)',
+                        color: 'white',
+                        boxShadow: '0 4px 12px var(--color-shadow-brand)',
+                      }
+                    : {
+                        color: 'var(--color-text-secondary)',
+                      }
+                }
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium">{tab.label}</span>
@@ -48,9 +69,15 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           })}
         </div>
       </nav>
-      <div className="p-4 border-t border-[#E5E7EB]">
+
+      {/* Theme Toggle */}
+      <div className="px-4 pb-2 flex justify-center">
+        <ThemeToggle variant="compact" />
+      </div>
+
+      <div className="p-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
         <div className="flex items-center gap-3 px-4 py-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-[#4F46E5] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
             {user?.profile_photo ? (
               <img
                 src={user.profile_photo}
@@ -62,8 +89,8 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             )}
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-semibold text-[#111827] truncate">{user?.username || 'User'}</p>
-            <p className="text-xs text-[#6B7280] truncate">{user?.email || 'No email'}</p>
+            <p className="text-sm font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{user?.username || 'User'}</p>
+            <p className="text-xs truncate" style={{ color: 'var(--color-text-secondary)' }}>{user?.email || 'No email'}</p>
           </div>
         </div>
       </div>

@@ -80,7 +80,7 @@ export function AddExpense({ onBack }: AddExpenseProps) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#F9FAFB]">
+    <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       <div className="md:hidden">
         <TopAppBar
           title={getModeTitle()}
@@ -88,12 +88,12 @@ export function AddExpense({ onBack }: AddExpenseProps) {
           onBackClick={onBack}
         />
       </div>
-      <div className="hidden md:block bg-white px-8 py-6 border-b border-[#E5E7EB]">
+      <div className="hidden md:block px-8 py-6 border-b" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-semibold text-[#111827]">
+          <h1 className="text-3xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
             {mode === 'bulk' ? 'Bulk Import Expenses' : mode === 'scan' ? 'Scan Receipt' : `Add New ${type === 'income' ? 'Income' : 'Expense'}`}
           </h1>
-          <p className="text-[#6B7280] mt-1">{getModeSubtitle()}</p>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{getModeSubtitle()}</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto pb-24 md:pb-8">
@@ -101,31 +101,37 @@ export function AddExpense({ onBack }: AddExpenseProps) {
 
           {/* Mode Toggle - Single vs Scan vs Bulk */}
           <div className="flex justify-center mb-6">
-            <div className="bg-white p-1 rounded-xl border border-[#E5E7EB] flex shadow-sm">
+            <div className="p-1 rounded-xl border flex shadow-sm" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
               <button
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${mode === 'single'
-                  ? 'bg-[#4F46E5] text-white shadow-sm'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6]'
-                  }`}
+                className="px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                style={
+                  mode === 'single'
+                    ? { backgroundColor: 'var(--color-brand)', color: 'white' }
+                    : { color: 'var(--color-text-secondary)' }
+                }
                 onClick={() => setMode('single')}
               >
                 <span>Single</span>
               </button>
               <button
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${mode === 'scan'
-                  ? 'bg-[#4F46E5] text-white shadow-sm'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6]'
-                  }`}
+                className="px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                style={
+                  mode === 'scan'
+                    ? { backgroundColor: 'var(--color-brand)', color: 'white' }
+                    : { color: 'var(--color-text-secondary)' }
+                }
                 onClick={() => setMode('scan')}
               >
                 <ScanLine className="w-4 h-4" />
                 <span>Scan</span>
               </button>
               <button
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${mode === 'bulk'
-                  ? 'bg-[#4F46E5] text-white shadow-sm'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6]'
-                  }`}
+                className="px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                style={
+                  mode === 'bulk'
+                    ? { backgroundColor: 'var(--color-brand)', color: 'white' }
+                    : { color: 'var(--color-text-secondary)' }
+                }
                 onClick={() => setMode('bulk')}
               >
                 <FileSpreadsheet className="w-4 h-4" />
@@ -149,7 +155,7 @@ export function AddExpense({ onBack }: AddExpenseProps) {
             <>
               {/* Type Toggle - Expense vs Income */}
               <div className="flex justify-center mb-6">
-                <div className="bg-white p-1 rounded-xl border border-[#E5E7EB] flex shadow-sm">
+              <div className="p-1 rounded-xl border flex shadow-sm" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
                   <button
                     className={`px-6 py-2 rounded-lg font-medium transition-colors ${type === 'expense' ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#6B7280] hover:bg-[#F3F4F6]'}`}
                     onClick={() => setType('expense')}
@@ -167,8 +173,8 @@ export function AddExpense({ onBack }: AddExpenseProps) {
 
               <div className="md:grid md:grid-cols-2 md:gap-6 space-y-6 md:space-y-0">
                 <div className="space-y-6">
-                  <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
-                    <p className="text-[#6B7280] text-sm mb-2">Amount</p>
+                  <div className="rounded-2xl p-6 shadow-sm text-center" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+                    <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondary)' }}>Amount</p>
                     <div className="flex items-center justify-center gap-2">
                       <span className={`text-4xl font-semibold ${type === 'income' ? 'text-[#16A34A]' : 'text-[#111827]'}`}>{currencySymbol}</span>
                       <input
@@ -192,26 +198,28 @@ export function AddExpense({ onBack }: AddExpenseProps) {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-[#111827] mb-2">Title</label>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Title</label>
                     <input
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder={type === 'income' ? "e.g., Salary, Freight" : "e.g., Grocery Shopping"}
-                      className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
+                      className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent"
+                      style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                     />
                   </div>
 
                   {/* Date Field */}
                   <div>
-                    <label className="block text-sm font-medium text-[#111827] mb-2">Date</label>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Date</label>
                     <div className="relative">
                       <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                         max={getTodayDate()}
-                        className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent appearance-none"
+                        className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent appearance-none"
+                        style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                       />
                       <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none" />
                     </div>
@@ -219,12 +227,13 @@ export function AddExpense({ onBack }: AddExpenseProps) {
 
                   {type === 'expense' && (
                     <div>
-                      <label className="block text-sm font-medium text-[#111827] mb-2">Category</label>
+                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Category</label>
                       <div className="relative">
                         <select
                           value={category}
                           onChange={(e) => setCategory(e.target.value)}
-                          className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] appearance-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
+                          className="w-full px-4 py-3 rounded-xl border appearance-none focus:outline-none focus:ring-2 focus:border-transparent"
+                          style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         >
                           <option value="">Select a category</option>
                           {categories.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
@@ -242,7 +251,7 @@ export function AddExpense({ onBack }: AddExpenseProps) {
 
       {/* Mobile Save Button - Only show in single mode */}
       {mode === 'single' && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] px-4 py-4 safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 border-t px-4 py-4 safe-area-bottom" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
           <div className="max-w-md mx-auto">
             <button
               onClick={handleSave}

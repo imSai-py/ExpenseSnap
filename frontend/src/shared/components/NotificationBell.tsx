@@ -142,8 +142,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   const NotificationContent = () => (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900">Notifications</h3>
+      <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+        <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>Notifications</h3>
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <button
@@ -166,76 +166,86 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       <div className={`overflow-y-auto ${isMobile ? 'max-h-[60vh]' : 'max-h-80'}`}>
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2" style={{ borderColor: 'var(--color-brand)' }}></div>
           </div>
         ) : error ? (
-          <div className="p-4 text-center text-red-500 text-sm">{error}</div>
+          <div className="p-4 text-center text-sm" style={{ color: 'var(--color-danger)' }}>{error}</div>
         ) : notifications.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-sm">No notifications yet</p>
-            <p className="text-xs text-gray-400 mt-1">Budget alerts will appear here</p>
+          <div className="flex flex-col items-center justify-center p-8 text-center" style={{ color: 'var(--color-text-secondary)' }}>
+            <Bell className="w-8 h-8 opacity-20 mb-3" />
+            <p className="font-medium">No notifications</p>
+            <p className="text-sm text-opacity-80">You're all caught up!</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y" style={{ borderColor: 'var(--color-divider)' }}>
             {notifications.map(notification => (
               <div
                 key={notification.id}
-                className={`p-4 hover:bg-gray-50 transition-colors ${
-                  !notification.is_read ? 'bg-indigo-50/50' : ''
-                }`}
+                className={`flex gap-3 p-4 border-b last:border-0 transition-colors ${notification.is_read ? '' : 'font-medium'}`}
+                style={{
+                  backgroundColor: notification.is_read ? 'transparent' : 'var(--color-brand-bg)',
+                  borderColor: 'var(--color-divider)'
+                }}
               >
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 mt-0.5">{getNotificationIcon(notification.type)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className={`text-sm ${!notification.is_read ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
-                        {notification.title}
-                      </p>
-                      <span className="text-xs text-gray-400 whitespace-nowrap">
-                        {formatTimeAgo(notification.created_at)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{notification.message}</p>
-                    {notification.data?.percentage && (
-                      <div className="mt-2">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                notification.data.percentage >= 100
-                                  ? 'bg-red-500'
-                                  : notification.data.percentage >= 80
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
+                    {getNotificationIcon(notification.type)}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm leading-snug" style={{ color: notification.is_read ? 'var(--color-text-secondary)' : 'var(--color-text-primary)' }}>
+                      {notification.title}
+                    </p>
+                    <span className="text-xs mt-1 font-normal" style={{ color: 'var(--color-text-tertiary)' }}>
+                      {formatTimeAgo(notification.created_at)}
+                    </span>
+                  </div>
+                  <p className="text-sm mt-0.5 line-clamp-2" style={{ color: 'var(--color-text-secondary)' }}>{notification.message}</p>
+                  {notification.data?.percentage && (
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
+                          <div
+                            className={`h-full rounded-full ${
+                              notification.data.percentage >= 100
+                                ? 'bg-red-500'
+                                : notification.data.percentage >= 80
                                   ? 'bg-amber-500'
                                   : 'bg-green-500'
-                              }`}
-                              style={{ width: `${Math.min(notification.data.percentage, 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-medium text-gray-600">
-                            {notification.data.percentage}%
-                          </span>
+                            }`}
+                            style={{ width: `${Math.min(notification.data.percentage, 100)}%` }}
+                          />
                         </div>
+                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                          {notification.data.percentage}%
+                        </span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2 mt-2">
-                      {!notification.is_read && (
-                        <button
-                          onClick={() => handleMarkAsRead(notification.id)}
-                          className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
-                        >
-                          <Check className="w-3 h-3" />
-                          Mark read
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(notification.id)}
-                        className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Delete
-                      </button>
                     </div>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    {!notification.is_read && (
+                      <button
+                        onClick={() => handleMarkAsRead(notification.id)}
+                        className="p-1.5 rounded-lg transition-colors group relative"
+                        style={{ color: 'var(--color-brand)' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-brand-bg)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                        title="Mark as read"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(notification.id)}
+                      className="p-1.5 rounded-lg transition-colors group relative"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-danger-bg)'; e.currentTarget.style.color = 'var(--color-danger)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -251,12 +261,16 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       {/* Bell Button */}
       <button
         onClick={handleBellClick}
-        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        className={`relative p-2 rounded-xl transition-all ${className} ${isOpen ? 'bg-black/5 dark:bg-white/10' : ''}`}
+        style={isOpen ? { backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-brand)' } : { color: 'var(--color-text-secondary)' }}
+        onMouseEnter={(e) => { if (!isOpen) { e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'; e.currentTarget.style.color = 'var(--color-text-primary)'; } }}
+        onMouseLeave={(e) => { if (!isOpen) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)'; } }}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
-        <Bell className="w-6 h-6 text-gray-600" />
+        <Bell className="w-5 h-5 md:w-6 md:h-6" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white bg-red-500 rounded-full transform translate-x-1 -translate-y-1">
+          <span className="absolute top-1.5 right-1.5 transform translate-x-1/4 -translate-y-1/4 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white rounded-full border-2"
+            style={{ backgroundColor: 'var(--color-danger)', borderColor: 'var(--color-bg-primary)' }}>
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -264,7 +278,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
       {/* Desktop Dropdown */}
       {isOpen && !isMobile && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+        <div
+          className="absolute right-0 mt-2 w-80 md:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 transform origin-top-right transition-all animate-in fade-in slide-in-from-top-2"
+          style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}
+        >
           <NotificationContent />
         </div>
       )}
@@ -274,12 +291,13 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 z-40"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
             onClick={() => setIsOpen(false)}
           />
           {/* Bottom Sheet */}
-          <div className="fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-xl animate-slide-up">
-            <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 mb-1" />
+          <div className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl shadow-xl animate-slide-up" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+            <div className="w-12 h-1.5 rounded-full mx-auto mt-3 mb-1" style={{ backgroundColor: 'var(--color-border)' }} />
             <NotificationContent />
             {/* Safe area padding for iOS */}
             <div className="h-safe-area-inset-bottom" />

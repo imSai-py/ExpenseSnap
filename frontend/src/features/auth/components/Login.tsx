@@ -60,15 +60,15 @@ export function Login({ onNavigateToRegister }: LoginProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
-            <div className="bg-white p-8 rounded-2xl shadow-sm w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+            <div className="p-8 rounded-2xl shadow-sm w-full max-w-md" style={{ backgroundColor: 'var(--color-bg-card)' }}>
                 <div className="flex justify-center mb-6">
-                    <div className="w-12 h-12 bg-[#4F46E5] rounded-xl flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
                         <Wallet className="w-7 h-7 text-white" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold text-center text-[#111827] mb-2">Welcome Back</h2>
-                <p className="text-[#6B7280] text-center mb-8">Login to manage your expenses.</p>
+                <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--color-text-primary)' }}>Welcome Back</h2>
+                <p className="text-center mb-8" style={{ color: 'var(--color-text-secondary)' }}>Login to manage your expenses.</p>
 
                 {error && (
                     <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6">
@@ -78,7 +78,7 @@ export function Login({ onNavigateToRegister }: LoginProps) {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-[#111827] mb-1">Username</label>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Username</label>
                         <input
                             type="text"
                             value={username}
@@ -88,14 +88,15 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                                 if (usernameError) validateUsername(e.target.value);
                             }}
                             onBlur={(e) => validateUsername(e.target.value)}
-                            className={`w-full px-4 py-3 bg-white rounded-xl border ${usernameError ? 'border-red-500' : 'border-[#E5E7EB]'} focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all`}
+                            className={`w-full px-4 py-3 rounded-xl border ${usernameError ? 'border-red-500' : ''} focus:ring-2 focus:border-transparent outline-none transition-all`}
+                            style={{ backgroundColor: 'var(--color-bg-card)', borderColor: usernameError ? undefined : 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
                             placeholder="Enter your username"
                             required
                         />
                         {usernameError && <p className="text-red-500 text-xs mt-1">{usernameError}</p>}
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#111827] mb-1">Password</label>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Password</label>
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
@@ -106,7 +107,8 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                                     if (passwordError) validatePassword(e.target.value);
                                 }}
                                 onBlur={(e) => validatePassword(e.target.value)}
-                                className={`w-full px-4 py-3 pr-12 bg-white rounded-xl border ${passwordError ? 'border-red-500' : 'border-[#E5E7EB]'} focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all`}
+                                className={`w-full px-4 py-3 pr-12 rounded-xl border ${passwordError ? 'border-red-500' : ''} focus:ring-2 focus:border-transparent outline-none transition-all`}
+                                style={{ backgroundColor: 'var(--color-bg-card)', borderColor: passwordError ? undefined : 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
                                 placeholder="••••••••"
                                 required
                             />
@@ -130,7 +132,8 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                     <button
                         type="submit"
                         disabled={loading || !!usernameError || !!passwordError}
-                        className="w-full bg-[#4F46E5] text-white py-3 rounded-xl font-semibold hover:bg-[#4338CA] transition-colors disabled:opacity-50"
+                        className="w-full text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-50"
+                        style={{ backgroundColor: 'var(--color-brand)' }}
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
@@ -139,10 +142,10 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                 {/* Divider */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-[#E5E7EB]"></div>
+                        <div className="w-full border-t" style={{ borderColor: 'var(--color-border)' }}></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="bg-white px-2 text-[#6B7280]">or</span>
+                        <span className="px-2" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-secondary)' }}>or</span>
                     </div>
                 </div>
 
@@ -153,7 +156,8 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                         const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
                         window.location.href = `${backendUrl}/login/google`;
                     }}
-                    className="w-full flex items-center justify-center gap-3 rounded-xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB] transition-colors"
+                    className="w-full flex items-center justify-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors"
+                    style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-primary)' }}
                 >
                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                         <path
@@ -176,9 +180,9 @@ export function Login({ onNavigateToRegister }: LoginProps) {
                     Continue with Google
                 </button>
 
-                <p className="text-center mt-6 text-[#6B7280] text-sm">
+                <p className="text-center mt-6 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     Don't have an account?{' '}
-                    <button onClick={onNavigateToRegister} className="text-[#4F46E5] font-semibold hover:underline">
+                    <button onClick={onNavigateToRegister} className="font-semibold hover:underline" style={{ color: 'var(--color-brand)' }}>
                         Register
                     </button>
                 </p>

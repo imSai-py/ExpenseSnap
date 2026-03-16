@@ -65,10 +65,8 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
       <button
         onClick={handleButtonClick}
         disabled={loading}
-        className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl font-semibold transition-colors shadow-sm ${loading
-            ? 'bg-[#9CA3AF] text-white cursor-not-allowed'
-            : 'bg-[#4F46E5] text-white hover:bg-[#4338CA] active:scale-[0.98]'
-          }`}
+        className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl font-semibold transition-colors shadow-sm disabled:opacity-50 text-sm`}
+        style={loading ? { backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-secondary)' } : { backgroundColor: 'var(--color-brand)', color: 'white' }}
       >
         {/* Left side - Icon and Text */}
         <div className="flex items-center gap-2">
@@ -129,19 +127,22 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-[#E5E7EB] py-2 z-50 min-w-[160px]">
-            <div className="px-3 py-2 border-b border-[#F3F4F6]">
-              <p className="text-xs font-medium text-[#6B7280]">Select Period</p>
+          <div className="absolute right-0 top-full mt-2 rounded-xl shadow-lg border py-2 z-50 min-w-[160px]" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
+            <div className="px-3 py-2 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+              <p className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>Select Period</p>
             </div>
             {PERIODS.map((period) => (
               <button
                 key={period.value}
                 onClick={() => handleDownload(period.value)}
-                className="w-full flex items-center justify-between px-4 py-2 text-left hover:bg-[#F9FAFB] transition-colors"
+                className="w-full flex items-center justify-between px-4 py-2 text-left transition-colors"
+                style={{ color: 'var(--color-text-primary)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <span className="text-sm text-[#111827]">{period.label}</span>
+                <span className="text-sm">{period.label}</span>
                 {selectedPeriod === period.value && (
-                  <Check className="w-4 h-4 text-[#4F46E5]" />
+                  <Check className="w-4 h-4" style={{ color: 'var(--color-brand)' }} />
                 )}
               </button>
             ))}
@@ -156,7 +157,7 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
         title="Download Report"
       >
         <div className="space-y-2">
-          <p className="text-sm text-[#6B7280] mb-4">
+          <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
             Select a time period to generate your expense report PDF.
           </p>
 
@@ -165,30 +166,27 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
               key={period.value}
               onClick={() => handleDownload(period.value)}
               disabled={loading}
-              className={`w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98] ${selectedPeriod === period.value
-                  ? 'bg-[#EEF2FF] border-2 border-[#4F46E5]'
-                  : 'bg-[#F9FAFB] border-2 border-transparent hover:bg-[#F3F4F6]'
-                }`}
+              className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98] border-2"
+              style={selectedPeriod === period.value 
+                ? { backgroundColor: 'var(--color-brand-bg)', borderColor: 'var(--color-brand)' } 
+                : { backgroundColor: 'var(--color-bg-subtle)', borderColor: 'transparent' }}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPeriod === period.value
-                    ? 'bg-[#4F46E5]'
-                    : 'bg-[#E5E7EB]'
-                  }`}>
-                  <FileText className={`w-5 h-5 ${selectedPeriod === period.value
-                      ? 'text-white'
-                      : 'text-[#6B7280]'
-                    }`} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: selectedPeriod === period.value ? 'var(--color-brand)' : 'var(--color-border)' }}
+                >
+                  <FileText className="w-5 h-5" 
+                    style={{ color: selectedPeriod === period.value ? 'white' : 'var(--color-text-secondary)' }}
+                  />
                 </div>
-                <span className={`font-medium ${selectedPeriod === period.value
-                    ? 'text-[#4F46E5]'
-                    : 'text-[#111827]'
-                  }`}>
+                <span className="font-medium"
+                  style={{ color: selectedPeriod === period.value ? 'var(--color-brand)' : 'var(--color-text-primary)' }}
+                >
                   {period.label}
                 </span>
               </div>
               {selectedPeriod === period.value && (
-                <Check className="w-5 h-5 text-[#4F46E5]" />
+                <Check className="w-5 h-5" style={{ color: 'var(--color-brand)' }} />
               )}
             </button>
           ))}
@@ -198,10 +196,8 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
         <button
           onClick={() => handleDownload(selectedPeriod)}
           disabled={loading}
-          className={`w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all active:scale-[0.98] ${loading
-              ? 'bg-[#9CA3AF] text-white cursor-not-allowed'
-              : 'bg-[#4F46E5] text-white hover:bg-[#4338CA]'
-            }`}
+          className="w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-xl font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+          style={loading ? { backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-secondary)' } : { backgroundColor: 'var(--color-brand)', color: 'white' }}
         >
           {loading ? (
             <>
@@ -239,7 +235,8 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
         <button
           onClick={() => setShowBottomSheet(false)}
           disabled={loading}
-          className="w-full mt-3 p-4 rounded-xl font-semibold bg-[#F3F4F6] text-[#374151] hover:bg-[#E5E7EB] transition-all active:scale-[0.98]"
+          className="w-full mt-3 p-4 rounded-xl font-semibold transition-all active:scale-[0.98]"
+          style={{ backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)' }}
         >
           Cancel
         </button>
@@ -247,8 +244,8 @@ export function ViewReportButton({ className = '' }: ViewReportButtonProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="absolute left-0 right-0 md:left-auto md:right-0 top-full mt-2 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-2 z-50">
-          <p className="text-sm text-[#DC2626]">{error}</p>
+        <div className="absolute left-0 right-0 md:left-auto md:right-0 top-full mt-2 border rounded-xl px-4 py-2 z-50 shadow-sm" style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
         </div>
       )}
     </div>

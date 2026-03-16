@@ -69,8 +69,8 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-red-50 p-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <div className="p-6 rounded-lg shadow-lg max-w-2xl w-full" style={{ backgroundColor: 'var(--color-bg-card)' }}>
             <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
             <pre className="bg-gray-100 p-4 rounded overflow-auto text-sm text-gray-800">
               {this.state.error?.toString()}

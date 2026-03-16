@@ -52,9 +52,9 @@ export function SwipeableExpenseItem({
   );
 
   const isExpense = type === 'expense';
-  const iconBgClass = isExpense ? 'bg-[#FEF2F2]' : 'bg-[#F0FDF4]';
-  const iconColorClass = isExpense ? 'text-[#DC2626]' : 'text-[#16A34A]';
-  const amountColorClass = isExpense ? 'text-[#DC2626]' : 'text-[#16A34A]';
+  const iconBgClass = isExpense ? 'bg-[var(--color-danger-bg)]' : 'bg-[var(--color-success-bg)]';
+  const iconColorClass = isExpense ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]';
+  const amountColorClass = isExpense ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]';
   const prefix = isExpense ? '-' : '+';
 
   const handleDrag = (_: any, info: PanInfo) => {
@@ -110,21 +110,25 @@ export function SwipeableExpenseItem({
   if (showConfirmDelete) {
     return (
       <div className="py-3 px-2">
-        <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-          <p className="text-[#111827] font-medium mb-1">Delete "{title}"?</p>
-          <p className="text-[#6B7280] text-sm mb-4">This action cannot be undone.</p>
+        <div className="rounded-xl p-4 border" style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
+          <p className="font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Delete "{title}"?</p>
+          <p className="text-sm mb-4" style={{ color: 'var(--color-danger)' }}>This action cannot be undone.</p>
           <div className="flex gap-3">
             <button
               onClick={handleCancelDelete}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2.5 rounded-lg font-medium bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 rounded-lg font-medium border transition-colors disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-card)'; }}
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2.5 rounded-lg font-medium bg-[#DC2626] text-white hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 rounded-lg font-medium text-white transition-colors disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-danger)' }}
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
@@ -170,8 +174,8 @@ export function SwipeableExpenseItem({
 
       {/* Swipeable content */}
       <motion.div
-        className="relative bg-white flex items-center gap-3 py-3 px-2 cursor-grab active:cursor-grabbing"
-        style={{ x }}
+        className="relative flex items-center gap-3 py-3 px-2 cursor-grab active:cursor-grabbing"
+        style={{ x, backgroundColor: 'var(--color-bg-card)' }}
         drag="x"
         dragConstraints={{ left: -ACTION_WIDTH * 1.5, right: ACTION_WIDTH * 1.5 }}
         dragElastic={0.1}
@@ -186,8 +190,8 @@ export function SwipeableExpenseItem({
 
         {/* Title and Date */}
         <div className="flex-1 min-w-0">
-          <p className="text-[#111827] font-medium truncate">{title}</p>
-          <p className="text-[#6B7280] text-xs mt-0.5">{date} - {category}</p>
+          <p className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{title}</p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>{date} - {category}</p>
         </div>
 
         {/* Amount */}
@@ -198,7 +202,7 @@ export function SwipeableExpenseItem({
 
       {/* Swipe hint indicator */}
       <div className="absolute left-1/2 bottom-0.5 transform -translate-x-1/2">
-        <div className="w-8 h-0.5 bg-[#E5E7EB] rounded-full" />
+        <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor: 'var(--color-border)' }} />
       </div>
     </div>
   );

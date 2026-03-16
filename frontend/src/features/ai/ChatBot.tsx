@@ -158,8 +158,10 @@ export function ChatBot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="fixed right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden md:right-8"
+                        className="fixed right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-2xl border flex flex-col overflow-hidden md:right-8"
                         style={{
+                            backgroundColor: 'var(--color-bg-card)',
+                            borderColor: 'var(--color-border-light)',
                             bottom: 'calc(var(--navbar-height, 70px) + 16px + 56px + 16px + env(safe-area-inset-bottom, 0px))',
                             height: 'min(520px, calc(100vh - 10rem))',
                         }}
@@ -199,8 +201,13 @@ export function ChatBot() {
                                     <div
                                         className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${msg.role === 'user'
                                             ? 'bg-indigo-500 text-white rounded-br-md'
-                                            : 'bg-gray-100 text-gray-800 rounded-bl-md'
+                                            : 'rounded-bl-md'
                                             }`}
+                                        style={
+                                            msg.role === 'user'
+                                                ? undefined
+                                                : { backgroundColor: 'var(--color-chat-bot-bg)', color: 'var(--color-chat-bot-text)' }
+                                        }
                                     >
                                         <div
                                             dangerouslySetInnerHTML={{ __html: formatMessageText(msg.text) }}
@@ -225,7 +232,7 @@ export function ChatBot() {
                             {/* Loading indicator */}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
+                                    <div className="rounded-2xl rounded-bl-md px-4 py-3" style={{ backgroundColor: 'var(--color-chat-bot-bg)' }}>
                                         <div className="flex items-center gap-2 text-gray-400 text-sm">
                                             <Loader2 size={14} className="animate-spin" />
                                             <span>Thinking...</span>
@@ -256,8 +263,8 @@ export function ChatBot() {
                         )}
 
                         {/* Input */}
-                        <div className="px-4 py-3 border-t border-gray-100 shrink-0">
-                            <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-2.5">
+                        <div className="px-4 py-3 border-t shrink-0" style={{ borderColor: 'var(--color-border-light)' }}>
+                            <div className="flex items-center gap-2 rounded-xl px-4 py-2.5" style={{ backgroundColor: 'var(--color-chat-input-bg)' }}>
                                 <input
                                     ref={inputRef}
                                     id="snapbot-input"
@@ -267,7 +274,8 @@ export function ChatBot() {
                                     onKeyDown={handleKeyPress}
                                     placeholder='Try "spent 200 on uber"...'
                                     disabled={isLoading}
-                                    className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50"
+                                    className="flex-1 bg-transparent text-sm placeholder-gray-400 outline-none disabled:opacity-50"
+                                    style={{ color: 'var(--color-text-primary)' }}
                                 />
                                 <button
                                     id="snapbot-send"

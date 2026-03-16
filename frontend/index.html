@@ -27,8 +27,32 @@
 </head>
 
 <body>
+  <!--
+    ANTI-FLICKER SCRIPT — runs synchronously BEFORE React loads.
+    Reads the stored theme from localStorage and applies the `dark` class
+    to <html> immediately to prevent white flash on dark-mode loads.
+  -->
+  <script>
+    (function() {
+      var stored = localStorage.getItem('expensesnap-theme');
+      var isDark = false;
+      if (stored === 'dark') {
+        isDark = true;
+      } else if (stored === 'light') {
+        isDark = false;
+      } else {
+        // 'system' or no preference: check OS
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#0F172A');
+      }
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
-</html>
+</html>

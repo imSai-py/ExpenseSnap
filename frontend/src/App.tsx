@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ExpenseProvider, useExpenses } from './shared/context/ExpenseContext';
+import { ThemeProvider } from './shared/context/ThemeContext';
 import { Dashboard } from './features/expenses/components/Dashboard';
 import { AddExpense } from './features/expenses/components/AddExpense';
 import { Statistics } from './features/statistics/components/Statistics';
@@ -46,8 +47,8 @@ function AppContent() {
   // If loading, show clearer loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
-        <div className="text-[#6B7280] font-medium">Loading ExpenseSnap...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+        <div className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Loading ExpenseSnap...</div>
       </div>
     );
   }
@@ -83,10 +84,10 @@ function AppContent() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#F9FAFB] font-['Inter',sans-serif]">
+    <div className="relative min-h-screen font-['Inter',sans-serif]" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="md:ml-64">
-        <div className="max-w-md md:max-w-none mx-auto bg-[#F9FAFB] min-h-screen relative shadow-2xl md:shadow-none">
+        <div className="max-w-md md:max-w-none mx-auto min-h-screen relative shadow-2xl md:shadow-none" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
           {currentScreen === 'dashboard' && (
             <Dashboard onAddExpenseClick={handleAddExpenseClick} />
           )}
@@ -110,8 +111,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ExpenseProvider>
-      <AppContent />
-    </ExpenseProvider>
+    <ThemeProvider>
+      <ExpenseProvider>
+        <AppContent />
+      </ExpenseProvider>
+    </ThemeProvider>
   );
 }

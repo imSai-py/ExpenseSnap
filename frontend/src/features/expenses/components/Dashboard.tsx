@@ -186,15 +186,15 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
   const initials = user?.username?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       <div className="flex-1 overflow-y-auto pb-24 md:pb-8">
         {/* Mobile Header */}
-        <div className="bg-white px-4 py-6 shadow-sm md:hidden">
+        <div className="px-4 py-6 shadow-sm md:hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
           <div className="max-w-md mx-auto flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-[#111827]">ExpenseSnap</h1>
+            <h1 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>ExpenseSnap</h1>
             <div className="flex items-center gap-2">
               <NotificationBell />
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#4F46E5] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
                 {user?.profile_photo ? (
                   <img
                     src={user.profile_photo}
@@ -210,11 +210,11 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden md:block bg-white px-8 py-6 border-b border-[#E5E7EB]">
+        <div className="hidden md:block px-8 py-6 border-b" style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)' }}>
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-[#111827]">Dashboard</h1>
-              <p className="text-[#6B7280] mt-1">Welcome back! Here's your financial overview.</p>
+              <h1 className="text-3xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Dashboard</h1>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Welcome back! Here's your financial overview.</p>
             </div>
             <NotificationBell />
           </div>
@@ -239,9 +239,14 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                 onClick={handleViewReport}
                 disabled={isGeneratingReport}
                 className={`flex-1 md:flex-none flex items-center justify-center gap-2 py-4 md:py-5 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md ${isGeneratingReport
-                  ? 'bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed'
-                  : 'bg-white text-[#111827] border border-[#E5E7EB] hover:bg-[#F9FAFB]'
+                  ? 'cursor-not-allowed'
+                  : ''
                   }`}
+                style={
+                  isGeneratingReport
+                    ? { backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-tertiary)' }
+                    : { backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }
+                }
               >
                 {isGeneratingReport ? (
                   <>
@@ -266,11 +271,11 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
           </div>
 
           {/* Expenses Section */}
-          <div className="bg-white rounded-2xl shadow-sm min-h-0">
+          <div className="rounded-2xl shadow-sm min-h-0" style={{ backgroundColor: 'var(--color-bg-card)' }}>
             {/* Header */}
-            <div className="p-4 md:p-6 border-b border-[#F3F4F6]">
+            <div className="p-4 md:p-6 border-b" style={{ borderColor: 'var(--color-divider)' }}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg md:text-xl font-semibold text-[#111827]">
+                <h3 className="text-lg md:text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                   {isExpanded ? 'All Transactions' : 'Recent Transactions'}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -282,7 +287,8 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                           handleClearFilters();
                         }
                       }}
-                      className="text-[#4F46E5] text-sm font-medium hover:text-[#4338CA] transition-colors"
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: 'var(--color-brand)' }}
                     >
                       {isExpanded ? 'Show Less' : 'See All'}
                     </button>
@@ -297,13 +303,14 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                   <div className="flex gap-2">
                     {/* Search Input */}
                     <div className="flex-1 relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9CA3AF]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-text-tertiary)' }} />
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search transactions..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB] text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                        style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
                       />
                       {searchQuery && (
                         <button
@@ -342,7 +349,7 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
 
                   {/* Filter Dropdowns */}
                   {showFilters && (
-                    <div className="flex flex-wrap gap-2 p-3 bg-[#F9FAFB] rounded-xl">
+                    <div className="flex flex-wrap gap-2 p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg-input)' }}>
                       {/* Year Filter */}
                       <div className="relative">
                         <select
@@ -352,7 +359,8 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                             setSelectedYear(year);
                             if (!year) setSelectedMonth(null);
                           }}
-                          className="appearance-none pl-3 pr-8 py-2 bg-white rounded-lg border border-[#E5E7EB] text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                          className="appearance-none pl-3 pr-8 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
+                          style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
                         >
                           <option value="">All Years</option>
                           {yearOptions.map(year => (
@@ -434,7 +442,7 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                 <div className="text-center py-8">
                   {hasActiveFilters ? (
                     <div className="space-y-2">
-                      <p className="text-[#6B7280]">No transactions found matching your filters.</p>
+                      <p style={{ color: 'var(--color-text-secondary)' }}>No transactions found matching your filters.</p>
                       <button
                         onClick={handleClearFilters}
                         className="text-[#4F46E5] text-sm font-medium hover:text-[#4338CA]"
@@ -443,14 +451,14 @@ export function Dashboard({ onAddExpenseClick }: DashboardProps) {
                       </button>
                     </div>
                   ) : (
-                    <p className="text-[#6B7280]">No expenses yet. Add your first expense!</p>
+                    <p style={{ color: 'var(--color-text-secondary)' }}>No expenses yet. Add your first expense!</p>
                   )}
                 </div>
               )}
 
               {/* Transactions */}
               {!isFiltering && allExpenses.length > 0 && (
-                <div className="divide-y divide-[#F3F4F6]">
+                <div className="divide-y" style={{ borderColor: 'var(--color-divider)' }}>
                   {displayedExpenses.map((expense, index) => (
                     <div
                       key={expense.id}

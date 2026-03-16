@@ -107,11 +107,14 @@ export function EditExpenseModal({
     >
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl animate-slide-up">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB]">
-          <h2 className="text-xl font-semibold text-[#111827]">Edit {type === 'income' ? 'Income' : 'Expense'}</h2>
+        <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+          <h2 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Edit {type === 'income' ? 'Income' : 'Expense'}</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[#F3F4F6] text-[#6B7280] hover:text-[#111827] transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--color-text-secondary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -121,19 +124,18 @@ export function EditExpenseModal({
         <div className="p-4 space-y-4">
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}>
               {error}
             </div>
           )}
 
           {/* Type Toggle */}
           <div className="flex justify-center">
-            <div className="bg-[#F3F4F6] p-1 rounded-xl flex">
+            <div className="p-1 rounded-xl flex" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
               <button
                 className={`px-5 py-2 rounded-lg font-medium transition-colors text-sm ${type === 'expense'
-                    ? 'bg-[#DC2626] text-white shadow-sm'
-                    : 'text-[#6B7280] hover:bg-[#E5E7EB]'
                   }`}
+                style={type === 'expense' || type === 'income' ? (type === 'expense' ? { backgroundColor: 'var(--color-danger)', color: 'white' } : { backgroundColor: 'var(--color-success)', color: 'white' }) : { color: 'var(--color-text-secondary)' }}
                 onClick={() => setType('expense')}
               >
                 Expense
@@ -151,8 +153,8 @@ export function EditExpenseModal({
           </div>
 
           {/* Amount */}
-          <div className="bg-[#F9FAFB] rounded-xl p-4 text-center">
-            <p className="text-[#6B7280] text-xs mb-1">Amount</p>
+          <div className="rounded-xl p-4 text-center" style={{ backgroundColor: 'var(--color-bg-input)' }}>
+            <p className="text-xs mb-1" style={{ color: 'var(--color-text-secondary)' }}>Amount</p>
             <div className="flex items-center justify-center gap-1">
               <span className={`text-2xl font-semibold ${type === 'income' ? 'text-[#16A34A]' : 'text-[#111827]'}`}>
                 {currencySymbol}
@@ -161,8 +163,8 @@ export function EditExpenseModal({
                 type="text"
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
-                className={`text-2xl font-semibold bg-transparent outline-none text-center w-32 ${type === 'income' ? 'text-[#16A34A]' : 'text-[#4F46E5]'
-                  }`}
+                className="text-2xl font-semibold bg-transparent outline-none text-center w-32"
+                style={{ color: type === 'income' ? 'var(--color-success)' : 'var(--color-brand)' }}
                 placeholder="0.00"
               />
             </div>
@@ -170,26 +172,28 @@ export function EditExpenseModal({
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-[#111827] mb-1.5">Title</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-primary)' }}>Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={type === 'income' ? "e.g., Salary" : "e.g., Grocery Shopping"}
-              className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
+              className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent"
+              style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
             />
           </div>
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-[#111827] mb-1.5">Date</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-primary)' }}>Date</label>
             <div className="relative">
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 max={getTodayDate()}
-                className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent appearance-none"
+                className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:border-transparent appearance-none"
+                style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
               />
               <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280] pointer-events-none" />
             </div>
@@ -198,12 +202,13 @@ export function EditExpenseModal({
           {/* Category (only for expenses) */}
           {type === 'expense' && (
             <div>
-              <label className="block text-sm font-medium text-[#111827] mb-1.5">Category</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text-primary)' }}>Category</label>
               <div className="relative">
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-white rounded-xl border border-[#E5E7EB] text-[#111827] appearance-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-xl border appearance-none focus:outline-none focus:ring-2 focus:border-transparent"
+                  style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border)', color: 'var(--color-text-primary)', '--tw-ring-color': 'var(--color-brand)' } as React.CSSProperties}
                 >
                   <option value="">Select a category</option>
                   {categories.map((cat) => (
@@ -217,21 +222,22 @@ export function EditExpenseModal({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-4 border-t border-[#E5E7EB]">
+        <div className="flex gap-3 p-4 border-t" style={{ borderColor: 'var(--color-divider)' }}>
           <button
             onClick={onClose}
             disabled={saving}
-            className="flex-1 px-4 py-3 rounded-xl font-semibold bg-[#F3F4F6] text-[#374151] hover:bg-[#E5E7EB] transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-3 rounded-xl font-semibold transition-colors disabled:opacity-50"
+            style={{ backgroundColor: 'var(--color-bg-subtle)', color: 'var(--color-text-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-border)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)'}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors disabled:opacity-50 ${type === 'income'
-                ? 'bg-[#16A34A] hover:bg-[#15803D]'
-                : 'bg-[#4F46E5] hover:bg-[#4338CA]'
-              }`}
+            className="flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-colors disabled:opacity-50"
+            style={{ backgroundColor: type === 'income' ? 'var(--color-success)' : 'var(--color-brand)' }}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
