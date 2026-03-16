@@ -31,6 +31,8 @@ export interface User {
   preferred_currency: string;
   profile_photo: string | null;
   total_expenses: number;
+  is_oauth_user?: boolean;
+  google_id?: boolean;
 }
 
 export interface ProfileUpdateData {

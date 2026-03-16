@@ -101,5 +101,7 @@ class User(UserMixin, db.Model):
             'profile_photo': self.profile_photo,
             'notify_daily_reminders': self.notify_daily_reminders,
             'notify_budget_alerts': self.notify_budget_alerts,
-            'monthly_limit': float(self.monthly_limit) if self.monthly_limit else 0
+            'monthly_limit': float(self.monthly_limit) if self.monthly_limit else 0,
+            'is_oauth_user': self.is_oauth_user,
+            'google_id': self.google_id is not None,
         }

@@ -95,5 +95,6 @@ class User(UserMixin, db.Model):
             'preferred_currency': self.preferred_currency,
             'profile_photo': self.profile_photo,
             'notify_daily_reminders': self.notify_daily_reminders,
-            'notify_budget_alerts': self.notify_budget_alerts
+            'notify_budget_alerts': self.notify_budget_alerts,
+            'is_oauth_user': self.is_oauth_user,
         }

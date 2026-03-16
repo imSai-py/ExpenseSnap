@@ -1,0 +1,3 @@
+2026-02-26 22:26:34,468 INFO: Database connection successful! [in C:\Users\saila\Desktop\ExpenseSnap\backend\app\__init__.py:199]
+2026-02-26 22:26:40,561 INFO: Database tables created/verified [in C:\Users\saila\Desktop\ExpenseSnap\backend\app\__init__.py:149]
+2026-02-26 22:26:40,561 INFO: ExpenseSnap started in production mode [in C:\Users\saila\Desktop\ExpenseSnap\backend\app\__init__.py:160]
