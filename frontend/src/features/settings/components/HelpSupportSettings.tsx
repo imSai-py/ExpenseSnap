@@ -51,48 +51,53 @@ export function HelpSupportSettings({ onClose }: HelpSupportSettingsProps) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#F9FAFB]">
+    <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       {/* Header */}
-      <div className="bg-white px-4 py-4 shadow-sm flex items-center gap-3">
+      <div className="px-4 py-4 shadow-sm flex items-center gap-3" style={{ backgroundColor: 'var(--color-bg-card)' }}>
         <button
           onClick={onClose}
-          className="p-2 -ml-2 hover:bg-[#F3F4F6] rounded-xl transition-colors"
+          className="p-2 -ml-2 rounded-xl transition-colors"
+          style={{ color: 'var(--color-text-primary)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
-          <ArrowLeft className="w-5 h-5 text-[#111827]" />
+          <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold text-[#111827]">Help & Support</h1>
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Help & Support</h1>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-24 md:pb-8">
         <div className="max-w-md mx-auto px-4 py-6 space-y-6">
           {/* FAQ Section */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#F3F4F6]">
+          <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#EEF2FF] rounded-xl flex items-center justify-center">
-                  <HelpCircle className="w-5 h-5 text-[#4F46E5]" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand-bg)' }}>
+                  <HelpCircle className="w-5 h-5" style={{ color: 'var(--color-brand)' }} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-[#111827]">
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                     Frequently Asked Questions
                   </h3>
-                  <p className="text-sm text-[#6B7280]">Find answers to common questions</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Find answers to common questions</p>
                 </div>
               </div>
             </div>
 
-            <div className="divide-y divide-[#F3F4F6]">
+            <div className="divide-y" style={{ borderColor: 'var(--color-divider)' }}>
               {FAQ_ITEMS.map((item, index) => (
                 <div key={index} className="overflow-hidden">
                   <button
                     onClick={() => toggleAccordion(index)}
-                    className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-[#F9FAFB] transition-colors"
+                    className="w-full flex items-center justify-between px-6 py-4 text-left transition-colors"
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <span className="text-[#111827] font-medium pr-4">{item.question}</span>
+                    <span className="font-medium pr-4" style={{ color: 'var(--color-text-primary)' }}>{item.question}</span>
                     <ChevronDown
-                      className={`w-5 h-5 text-[#6B7280] flex-shrink-0 transition-transform duration-200 ${expandedIndex === index ? 'rotate-180' : ''
-                        }`}
+                      className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${expandedIndex === index ? 'rotate-180' : ''}`}
+                      style={{ color: 'var(--color-text-secondary)' }}
                     />
                   </button>
                   <div
@@ -100,7 +105,7 @@ export function HelpSupportSettings({ onClose }: HelpSupportSettingsProps) {
                       }`}
                   >
                     <div className="px-6 pb-4">
-                      <p className="text-[#6B7280] text-sm leading-relaxed">{item.answer}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{item.answer}</p>
                     </div>
                   </div>
                 </div>
@@ -109,10 +114,10 @@ export function HelpSupportSettings({ onClose }: HelpSupportSettingsProps) {
           </div>
 
           {/* Contact Support Section */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#F3F4F6]">
-              <h3 className="text-lg font-semibold text-[#111827]">Need More Help?</h3>
-              <p className="text-sm text-[#6B7280] mt-1">
+          <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Need More Help?</h3>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 Can't find what you're looking for? Reach out to us.
               </p>
             </div>
@@ -120,14 +125,17 @@ export function HelpSupportSettings({ onClose }: HelpSupportSettingsProps) {
             <div className="p-6 space-y-3">
               <a
                 href="mailto:support@expensesnap.com"
-                className="flex items-center gap-4 p-4 bg-[#F9FAFB] rounded-xl hover:bg-[#F3F4F6] transition-colors"
+                className="flex items-center gap-4 p-4 rounded-xl transition-colors"
+                style={{ backgroundColor: 'var(--color-bg-subtle)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-subtle)'}
               >
-                <div className="w-10 h-10 bg-[#EEF2FF] rounded-xl flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-[#4F46E5]" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand-bg)' }}>
+                  <Mail className="w-5 h-5" style={{ color: 'var(--color-brand)' }} />
                 </div>
                 <div>
-                  <p className="text-[#111827] font-medium">Email Support</p>
-                  <p className="text-[#6B7280] text-sm">sailakshman212005@gmail.com</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Email Support</p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>sailakshman212005@gmail.com</p>
                 </div>
               </a>
             </div>
@@ -135,8 +143,8 @@ export function HelpSupportSettings({ onClose }: HelpSupportSettingsProps) {
 
           {/* App Version */}
           <div className="text-center pt-4">
-            <p className="text-[#9CA3AF] text-sm">ExpenseSnap v1.0.0</p>
-            <p className="text-[#9CA3AF] text-xs mt-1">Made with care for your finances</p>
+            <p className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>ExpenseSnap v1.0.0</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Made with care for your finances</p>
           </div>
         </div>
       </div>

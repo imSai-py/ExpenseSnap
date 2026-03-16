@@ -145,47 +145,47 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
 
   // Permission explanation modal
   const renderPermissionExplanation = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'var(--color-overlay)' }}>
+      <div className="rounded-2xl max-w-md w-full p-6 shadow-xl" style={{ backgroundColor: 'var(--color-bg-card)' }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-[#EEF2FF] rounded-xl flex items-center justify-center">
-            <Bell className="w-6 h-6 text-[#4F46E5]" />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand-bg)' }}>
+            <Bell className="w-6 h-6" style={{ color: 'var(--color-brand)' }} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-[#111827]">Enable Notifications</h3>
-            <p className="text-sm text-[#6B7280]">Stay on top of your finances</p>
+            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Enable Notifications</h3>
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Stay on top of your finances</p>
           </div>
         </div>
 
         <div className="space-y-4 mb-6">
-          <p className="text-[#374151] text-sm">
+          <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
             To receive reminders and alerts, ExpenseSnap needs permission to send you notifications.
           </p>
 
-          <div className="bg-[#F9FAFB] rounded-xl p-4 space-y-3">
+          <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: 'var(--color-bg-subtle)' }}>
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
               <div>
-                <p className="text-[#111827] font-medium text-sm">Daily Reminders</p>
-                <p className="text-[#6B7280] text-xs">Get reminded to log your expenses</p>
+                <p className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>Daily Reminders</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Get reminded to log your expenses</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
               <div>
-                <p className="text-[#111827] font-medium text-sm">Budget Alerts</p>
-                <p className="text-[#6B7280] text-xs">Know when you're approaching your limits</p>
+                <p className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>Budget Alerts</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Know when you're approaching your limits</p>
               </div>
             </div>
           </div>
 
           {permission === 'denied' && (
-            <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-4">
+            <div className="border rounded-xl p-4" style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
               <div className="flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+                <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-danger)' }} />
                 <div>
-                  <p className="text-[#DC2626] font-medium text-sm">Permission Previously Denied</p>
-                  <p className="text-[#B91C1C] text-xs mt-1">
+                  <p className="font-medium text-sm" style={{ color: 'var(--color-danger)' }}>Permission Previously Denied</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-danger)' }}>
                     You'll need to enable notifications in your browser settings. Click the lock icon in your address bar and allow notifications for this site.
                   </p>
                 </div>
@@ -197,7 +197,10 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
         <div className="flex gap-3">
           <button
             onClick={() => setPermissionUIState('idle')}
-            className="flex-1 px-4 py-3 border border-[#E5E7EB] rounded-xl text-[#374151] font-medium hover:bg-[#F9FAFB] transition-colors"
+            className="flex-1 px-4 py-3 border rounded-xl font-medium transition-colors"
+            style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             Not Now
           </button>
@@ -205,7 +208,8 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
             <button
               onClick={handleEnablePushNotifications}
               disabled={pushLoading}
-              className="flex-1 px-4 py-3 bg-[#4F46E5] rounded-xl text-white font-medium hover:bg-[#4338CA] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 rounded-xl text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              style={{ backgroundColor: 'var(--color-brand)' }}
             >
               {pushLoading ? (
                 <>
@@ -227,11 +231,11 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
     // Show loading state while service worker is initializing
     if (pushLoading && !serviceWorkerReady) {
       return (
-        <div className="bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl p-4 flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-[#6B7280] animate-spin flex-shrink-0" />
+        <div className="border rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: 'var(--color-bg-subtle)', borderColor: 'var(--color-border)' }}>
+          <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" style={{ color: 'var(--color-text-secondary)' }} />
           <div>
-            <p className="text-[#374151] font-medium text-sm">Initializing...</p>
-            <p className="text-[#6B7280] text-xs">Setting up push notifications</p>
+            <p className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>Initializing...</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Setting up push notifications</p>
           </div>
         </div>
       );
@@ -253,11 +257,11 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
 
     if (permission === 'denied') {
       return (
-        <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-4 flex items-start gap-3">
-          <XCircle className="w-5 h-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
+        <div className="border rounded-xl p-4 flex items-start gap-3" style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
+          <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-danger)' }} />
           <div>
-            <p className="text-[#DC2626] font-medium text-sm">Notifications Blocked</p>
-            <p className="text-[#B91C1C] text-xs mt-1">
+            <p className="font-medium text-sm" style={{ color: 'var(--color-danger)' }}>Notifications Blocked</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-danger)' }}>
               Enable notifications in your browser settings to receive reminders and alerts.
             </p>
           </div>
@@ -267,21 +271,24 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
 
     if (isSubscribed) {
       return (
-        <div className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl p-4 flex items-start gap-3">
-          <CheckCircle className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+        <div className="border rounded-xl p-4 flex items-start gap-3" style={{ backgroundColor: 'var(--color-success-bg)', borderColor: 'var(--color-success)' }}>
+          <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
           <div className="flex-1">
-            <p className="text-[#065F46] font-medium text-sm">Notifications Enabled</p>
-            <p className="text-[#047857] text-xs mt-1">
+            <p className="font-medium text-sm" style={{ color: 'var(--color-success)' }}>Notifications Enabled</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--color-success)' }}>
               You'll receive push notifications on this device.
             </p>
           </div>
           <button
             onClick={handleSendTestNotification}
             disabled={saving || pushLoading}
-            className="p-2 hover:bg-[#D1FAE5] rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{ color: 'var(--color-success)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-success-bg)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             title="Send test notification"
           >
-            <Send className="w-4 h-4 text-[#10B981]" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       );
@@ -290,14 +297,15 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
     return (
       <button
         onClick={() => setPermissionUIState('explaining')}
-        className="w-full bg-[#EEF2FF] border border-[#C7D2FE] rounded-xl p-4 flex items-center gap-3 hover:bg-[#E0E7FF] transition-colors"
+        className="w-full border rounded-xl p-4 flex items-center gap-3 transition-colors"
+        style={{ backgroundColor: 'var(--color-brand-bg)', borderColor: 'var(--color-brand)' }}
       >
-        <div className="w-10 h-10 bg-[#4F46E5] rounded-xl flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
           <Smartphone className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 text-left">
-          <p className="text-[#4F46E5] font-medium text-sm">Enable Push Notifications</p>
-          <p className="text-[#6366F1] text-xs">Tap to receive reminders on this device</p>
+          <p className="font-medium text-sm" style={{ color: 'var(--color-brand)' }}>Enable Push Notifications</p>
+          <p className="text-xs" style={{ color: 'var(--color-brand)' }}>Tap to receive reminders on this device</p>
         </div>
       </button>
     );
@@ -305,34 +313,40 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-screen bg-[#F9FAFB]">
-        <div className="bg-white px-4 py-4 shadow-sm flex items-center gap-3">
-          <button onClick={onClose} className="p-2 -ml-2 hover:bg-[#F3F4F6] rounded-xl transition-colors">
-            <ArrowLeft className="w-5 h-5 text-[#111827]" />
+      <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+        <div className="px-4 py-4 shadow-sm flex items-center gap-3" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+          <button onClick={onClose} className="p-2 -ml-2 rounded-xl transition-colors" style={{ color: 'var(--color-text-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-semibold text-[#111827]">Notifications</h1>
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Notifications</h1>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-[#4F46E5] animate-spin" />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--color-brand)' }} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#F9FAFB]">
+    <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
       {/* Permission Modal */}
       {permissionUIState !== 'idle' && renderPermissionExplanation()}
 
       {/* Header */}
-      <div className="bg-white px-4 py-4 shadow-sm flex items-center gap-3">
+      <div className="px-4 py-4 shadow-sm flex items-center gap-3" style={{ backgroundColor: 'var(--color-bg-card)' }}>
         <button
           onClick={onClose}
-          className="p-2 -ml-2 hover:bg-[#F3F4F6] rounded-xl transition-colors"
+          className="p-2 -ml-2 rounded-xl transition-colors"
+          style={{ color: 'var(--color-text-primary)' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
-          <ArrowLeft className="w-5 h-5 text-[#111827]" />
+          <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-semibold text-[#111827]">Notifications</h1>
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Notifications</h1>
       </div>
 
       {/* Content */}
@@ -340,17 +354,17 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
         <div className="max-w-md mx-auto px-4 py-6 space-y-4">
           {/* Error Message */}
           {(error || pushError) && (
-            <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
-              <p className="text-[#DC2626] text-sm">{error || pushError}</p>
+            <div className="border rounded-xl p-4 flex items-start gap-3" style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-danger)' }} />
+              <p className="text-sm" style={{ color: 'var(--color-danger)' }}>{error || pushError}</p>
             </div>
           )}
 
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl p-4 flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-              <p className="text-[#065F46] text-sm">{successMessage}</p>
+            <div className="border rounded-xl p-4 flex items-start gap-3" style={{ backgroundColor: 'var(--color-success-bg)', borderColor: 'var(--color-success)' }}>
+              <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
+              <p className="text-sm" style={{ color: 'var(--color-success)' }}>{successMessage}</p>
             </div>
           )}
 
@@ -358,31 +372,31 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
           {renderPushStatus()}
 
           {/* Notification Preferences */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#F3F4F6]">
-              <h3 className="text-lg font-semibold text-[#111827]">Notification Preferences</h3>
-              <p className="text-sm text-[#6B7280] mt-1">
+          <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--color-bg-card)' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--color-divider)' }}>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Notification Preferences</h3>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 Control how and when you receive notifications.
               </p>
             </div>
 
-            <div className="divide-y divide-[#F3F4F6]">
+            <div className="divide-y" style={{ borderColor: 'var(--color-divider)' }}>
               {/* Daily Reminders Toggle */}
               <div className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#EEF2FF] rounded-xl flex items-center justify-center">
-                    <Bell className="w-5 h-5 text-[#4F46E5]" />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand-bg)' }}>
+                    <Bell className="w-5 h-5" style={{ color: 'var(--color-brand)' }} />
                   </div>
                   <div>
-                    <p className="text-[#111827] font-medium">Daily Reminders</p>
-                    <p className="text-[#6B7280] text-sm">Get reminded to log your expenses daily</p>
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Daily Reminders</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Get reminded to log your expenses daily</p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleToggle('daily_reminders', !dailyReminders)}
                   disabled={saving || pushLoading}
-                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${dailyReminders ? 'bg-[#4F46E5]' : 'bg-[#D1D5DB]'
-                    } ${saving || pushLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${saving || pushLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  style={{ backgroundColor: dailyReminders ? 'var(--color-brand)' : 'var(--color-border)' }}
                 >
                   <span
                     className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${dailyReminders ? 'translate-x-5' : 'translate-x-0'
@@ -398,15 +412,15 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
                     <AlertCircle className="w-5 h-5 text-[#F59E0B]" />
                   </div>
                   <div>
-                    <p className="text-[#111827] font-medium">Budget Alerts</p>
-                    <p className="text-[#6B7280] text-sm">Get notified when approaching budget limits</p>
+                    <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Budget Alerts</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Get notified when approaching budget limits</p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleToggle('budget_alerts', !budgetAlerts)}
                   disabled={saving || pushLoading}
-                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${budgetAlerts ? 'bg-[#4F46E5]' : 'bg-[#D1D5DB]'
-                    } ${saving || pushLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${saving || pushLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  style={{ backgroundColor: budgetAlerts ? 'var(--color-brand)' : 'var(--color-border)' }}
                 >
                   <span
                     className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${budgetAlerts ? 'translate-x-5' : 'translate-x-0'
@@ -422,13 +436,16 @@ export function NotificationsSettings({ onClose }: NotificationsSettingsProps) {
             <button
               onClick={handleDisablePushNotifications}
               disabled={saving || pushLoading}
-              className="w-full py-3 text-[#DC2626] text-sm font-medium hover:bg-[#FEF2F2] rounded-xl transition-colors disabled:opacity-50"
+              className="w-full py-3 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
+              style={{ color: 'var(--color-danger)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-danger-bg)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               {saving ? 'Disabling...' : 'Disable Push Notifications on This Device'}
             </button>
           )}
 
-          <p className="text-center text-[#9CA3AF] text-xs px-4">
+          <p className="text-center text-xs px-4" style={{ color: 'var(--color-text-tertiary)' }}>
             Push notifications are sent to each device separately. Enable them on all devices where you want to receive alerts.
           </p>
         </div>
