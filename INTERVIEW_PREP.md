@@ -1331,6 +1331,23 @@ class AIService:
 ai_service = AIService()
 ```
 
+### Receipt OCR (Image Scanning)
+
+In addition to text parsing, ExpenseSnap features **Receipt Scanning** using the same Gemini 2.5 Flash model, which has native multimodal (vision) capabilities. 
+
+**Flow:**
+1. Frontend captures a photo via `<input type="file" capture="environment">` or file upload.
+2. Image bytes are sent to `POST /api/scan-receipt` as `multipart/form-data`.
+3. The `ReceiptOCRService` lazy-loads Gemini and sends the image bytes along with a strict system prompt (`RECEIPT_PARSE_PROMPT`).
+4. Gemini extracts: merchant name, total amount, currency, date, and an array of individual items with their assigned categories.
+5. Response is parsed as JSON, validated, and returned to the frontend.
+6. The user selects which parsed items to save, and they are added as regular expenses.
+
+**Why Gemini Vision instead of Tesseract?**
+- **Zero additional dependencies**: We already had `google-generativeai` installed for the chatbot. Tesseract requires system-level binaries (C++) and complex Python wrappers (`pytesseract`).
+- **Better accuracy**: Tesseract only extracts raw text; you still have to write complex Regex to figure out what is an amount vs a date. Gemini understands the *semantic structure* of the receipt and returns a ready-to-use JSON object.
+- **Categorization**: Gemini can automatically categorize "Starbucks" as "Food" or "Uber" as "Transport" based on its world knowledge, something traditional OCR cannot do.
+
 **Key Design Decisions:**
 
 | Decision | Why |
