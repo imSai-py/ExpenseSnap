@@ -13,8 +13,8 @@ import requests
 import sys
 
 # Configuration
-RENDER_BACKEND_URL = "https://expensesnap-crp6.onrender.com"
-VERCEL_FRONTEND_URL = "https://expense-snap-chi.vercel.app"
+RENDER_BACKEND_URL = "https://us-central1-expensesnap-a1995.cloudfunctions.net/expensesnap"
+VERCEL_FRONTEND_URL = "https://expensesnap-a1995.web.app"
 
 def get_backend_vapid_key():
     """Fetch VAPID public key from Render backend."""

@@ -16,19 +16,28 @@ from .forms import LoginForm, RegistrationForm
 auth = Blueprint('auth', __name__)
 
 
+def _get_redirect_uri():
+    """Get the Google OAuth redirect URI based on environment."""
+    env_redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if env_redirect_uri:
+        return env_redirect_uri
+
+    # Use FRONTEND_URL or hosting URL if available to build redirect URI.
+    # This keeps OAuth cookies as first-party cookies on the hosting domain.
+    frontend_url = _get_frontend_url()
+    if frontend_url:
+        return f"{frontend_url.rstrip('/')}/auth/callback"
+
+    # Fallback to Flask url_for
+    return url_for('auth.google_auth', _external=True)
+
+
 @auth.route('/login/google')
 def google_login():
     """Initiate Google OAuth flow."""
     try:
         google = oauth.create_client('google')
-
-        # In production (Firebase), url_for generates wrong scheme/path.
-        # Use FUNCTION_URL env var to build the correct redirect URI.
-        function_url = os.environ.get('FUNCTION_URL')
-        if function_url:
-            redirect_uri = f"{function_url.rstrip('/')}/auth/callback"
-        else:
-            redirect_uri = url_for('auth.google_auth', _external=True)
+        redirect_uri = _get_redirect_uri()
 
         current_app.logger.info(f"Google OAuth redirect URI: {redirect_uri}")
         return google.authorize_redirect(redirect_uri)
@@ -45,7 +54,8 @@ def google_auth():
 
     try:
         google = oauth.create_client('google')
-        token = google.authorize_access_token()
+        redirect_uri = _get_redirect_uri()
+        token = google.authorize_access_token(redirect_uri=redirect_uri)
         user_info = token.get('userinfo')
 
         if not user_info:
@@ -346,4 +356,4 @@ def _get_frontend_url():
     if os.environ.get('FLASK_ENV') == 'production':
         return 'https://expensesnap-a1995.web.app'
 
-    return 'http://localhost:5173'
+    return 'http://localhost:5000'

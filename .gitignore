@@ -33,6 +33,17 @@ instance/
 *.swp
 *.swo
 
-# OS
 .DS_Store
 Thumbs.db
+
+# Firebase Hosting
+.firebase/
+.firebase-hosting-cache/
+
+# Project tool directories
+.codex/
+.claude/
+
+# Temporary logs and status files
+status.txt
+*.log

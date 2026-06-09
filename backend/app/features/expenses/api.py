@@ -806,7 +806,9 @@ def get_profile():
                 'email': current_user.email or '',
                 'preferred_currency': current_user.preferred_currency,
                 'profile_photo': current_user.profile_photo,
-                'total_expenses': expense_count
+                'total_expenses': expense_count,
+                'is_oauth_user': current_user.is_oauth_user,
+                'google_id': current_user.google_id is not None
             }
         })
     except Exception as e:
@@ -919,7 +921,9 @@ def update_profile():
                 'email': current_user.email or '',
                 'preferred_currency': current_user.preferred_currency,
                 'profile_photo': current_user.profile_photo,
-                'total_expenses': expense_count
+                'total_expenses': expense_count,
+                'is_oauth_user': current_user.is_oauth_user,
+                'google_id': current_user.google_id is not None
             }
         })
     except Exception as e:

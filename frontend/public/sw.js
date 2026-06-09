@@ -22,18 +22,10 @@ const PRECACHE_ASSETS = [
 
 /**
  * Get the API base URL based on the current origin.
- * In production (Vercel), this points to the Render backend.
- * In development, it uses relative URLs.
+ * In production (Firebase Hosting), relative URLs are used.
  */
 function getApiBaseUrl() {
-  const origin = self.location.origin;
-
-  // Production: Vercel frontend -> Render backend
-  if (origin.includes('vercel.app') || origin.includes('expense-snap')) {
-    return 'https://expensesnap-crp6.onrender.com/api';
-  }
-
-  // Development: Use relative URL (same origin)
+  // Always use relative URL (same origin) since Firebase Hosting handles rewrites
   return '/api';
 }
 

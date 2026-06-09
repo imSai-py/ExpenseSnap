@@ -53,9 +53,6 @@ def create_app(config_name: Optional[str] = None) -> Flask:
         # Production origins - Firebase
         "https://expensesnap-a1995.web.app",
         "https://expensesnap-a1995.firebaseapp.com",
-        # Legacy origins - Render/Vercel (keep for transition)
-        "https://expensesnap-crp6.onrender.com",
-        "https://expense-snap-chi.vercel.app",
     ]
 
     # Also allow custom frontend URL from environment variable

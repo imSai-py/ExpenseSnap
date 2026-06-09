@@ -222,7 +222,7 @@ export function Register({ onNavigateToLogin }: RegisterProps) {
                 <button
                     type="button"
                     onClick={() => {
-                        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+                        const backendUrl = import.meta.env.VITE_API_URL || '';
                         window.location.href = `${backendUrl}/login/google`;
                     }}
                     className="w-full flex items-center justify-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors"

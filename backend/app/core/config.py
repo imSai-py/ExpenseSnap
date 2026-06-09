@@ -28,10 +28,11 @@ class Config:
         'echo': False,                   # Set to True to log all SQL queries
     }
 
-    # Session security - for cross-domain (Vercel frontend + Render backend)
-    SESSION_COOKIE_SECURE: bool = True  # Required for SameSite=None
+    # Session security - modified for Same-Origin/Firebase Hosting rewrite
+    SESSION_COOKIE_NAME: str = '__session'  # Required by Firebase Hosting to prevent cookie stripping
+    SESSION_COOKIE_SECURE: bool = True  # Required for HTTPS in production
     SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = 'None'  # Allow cross-domain cookies
+    SESSION_COOKIE_SAMESITE: str = 'Lax'  # First-party cookie alignment
 
     # CSRF Protection
     WTF_CSRF_ENABLED: bool = True
