@@ -9,6 +9,9 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://expensesnap-a1995.web.app/
     steps:
       - uses: actions/checkout@v4
       
