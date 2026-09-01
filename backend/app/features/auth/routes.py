@@ -63,8 +63,7 @@ def google_auth():
 
     try:
         google = oauth.create_client('google')
-        redirect_uri = _get_redirect_uri()
-        token = google.authorize_access_token(redirect_uri=redirect_uri)
+        token = google.authorize_access_token()
         user_info = token.get('userinfo')
 
         if not user_info:
