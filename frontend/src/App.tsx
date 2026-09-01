@@ -33,12 +33,13 @@ function AppContent() {
 
     if (params.get('auth_error')) {
       const error = params.get('auth_error');
-      console.error('Google auth error:', error);
+      const details = params.get('details');
+      console.error('Google auth error:', error, details);
       let msg = 'Google Sign-In failed. Please try again.';
       if (error === 'google_not_configured') {
         msg = 'Google Sign-In is not configured on the backend server (GOOGLE_CLIENT_ID missing).';
       } else if (error === 'callback_failed') {
-        msg = 'Google authentication failed on the server. Please check server logs or login with username/password.';
+        msg = details ? `Google Sign-In failed: ${details}` : 'Google authentication failed on the server. Please check server logs or login with username/password.';
       } else if (error === 'google_unavailable') {
         msg = 'Google login service is currently unavailable.';
       } else if (error === 'no_user_info') {

@@ -112,11 +112,15 @@ def google_auth():
         return redirect(f"{frontend_url}?auth_success=true")
 
     except Exception as e:
-        current_app.logger.error(f"Google auth callback error: {e}")
+        error_type = type(e).__name__
+        error_msg = str(e)
+        current_app.logger.error(f"Google auth callback error [{error_type}]: {error_msg}")
         import traceback
+        import urllib.parse
         current_app.logger.error(traceback.format_exc())
         db.session.rollback()
-        return redirect(f"{frontend_url}?auth_error=callback_failed")
+        safe_msg = urllib.parse.quote(f"{error_type}: {error_msg}")
+        return redirect(f"{frontend_url}?auth_error=callback_failed&details={safe_msg}")
 
 
 @auth.route('/login', methods=['GET', 'POST'])

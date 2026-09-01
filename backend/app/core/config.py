@@ -12,7 +12,7 @@ class Config:
     """Base configuration with secure defaults."""
 
     # Security - MUST be set via environment variable in production
-    SECRET_KEY: str = os.environ.get('SECRET_KEY') or os.urandom(32).hex()
+    SECRET_KEY: str = os.environ.get('SECRET_KEY') or 'expensesnap-prod-secret-key-fixed-fallback-2026'
 
     # Database
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
