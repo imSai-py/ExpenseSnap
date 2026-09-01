@@ -20,6 +20,7 @@ function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [showRegister, setShowRegister] = useState(false);
+  const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
 
   // Handle Google OAuth redirect
   useEffect(() => {
@@ -33,6 +34,17 @@ function AppContent() {
     if (params.get('auth_error')) {
       const error = params.get('auth_error');
       console.error('Google auth error:', error);
+      let msg = 'Google Sign-In failed. Please try again.';
+      if (error === 'google_not_configured') {
+        msg = 'Google Sign-In is not configured on the backend server (GOOGLE_CLIENT_ID missing).';
+      } else if (error === 'callback_failed') {
+        msg = 'Google authentication failed on the server. Please check server logs or login with username/password.';
+      } else if (error === 'google_unavailable') {
+        msg = 'Google login service is currently unavailable.';
+      } else if (error === 'no_user_info') {
+        msg = 'Failed to retrieve profile information from Google.';
+      }
+      setAuthErrorMsg(msg);
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
@@ -57,7 +69,7 @@ function AppContent() {
     if (showRegister) {
       return <Register onNavigateToLogin={() => setShowRegister(false)} />;
     }
-    return <Login onNavigateToRegister={() => setShowRegister(true)} />;
+    return <Login onNavigateToRegister={() => setShowRegister(true)} initialError={authErrorMsg} />;
   }
 
   const handleTabChange = (tab: Tab) => {

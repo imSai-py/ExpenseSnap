@@ -35,6 +35,14 @@ def _get_redirect_uri():
 @auth.route('/login/google')
 def google_login():
     """Initiate Google OAuth flow."""
+    frontend_url = _get_frontend_url()
+    client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+    client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
+
+    if not client_id or not client_secret:
+        current_app.logger.error("Google OAuth login attempted but GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing.")
+        return redirect(f"{frontend_url}?auth_error=google_not_configured")
+
     try:
         google = oauth.create_client('google')
         redirect_uri = _get_redirect_uri()
@@ -43,7 +51,8 @@ def google_login():
         return google.authorize_redirect(redirect_uri)
     except Exception as e:
         current_app.logger.error(f"Google login error: {e}")
-        frontend_url = _get_frontend_url()
+        import traceback
+        current_app.logger.error(traceback.format_exc())
         return redirect(f"{frontend_url}?auth_error=google_unavailable")
 
 

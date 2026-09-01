@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useExpenses } from '../../../shared/context/ExpenseContext';
 import { Wallet, Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
     onNavigateToRegister: () => void;
+    initialError?: string | null;
 }
 
-export function Login({ onNavigateToRegister }: LoginProps) {
+export function Login({ onNavigateToRegister, initialError }: LoginProps) {
     const { login } = useExpenses();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(initialError || '');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (initialError) {
+            setError(initialError);
+        }
+    }, [initialError]);
 
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');

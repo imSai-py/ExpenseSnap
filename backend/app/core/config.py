@@ -39,8 +39,8 @@ class Config:
     WTF_CSRF_TIME_LIMIT: int = 3600  # 1 hour
 
     # OAuth
-    GOOGLE_CLIENT_ID: Optional[str] = os.environ.get('GCLOUD_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET: Optional[str] = os.environ.get('GCLOUD_CLIENT_SECRET')
+    GOOGLE_CLIENT_ID: Optional[str] = os.environ.get('GOOGLE_CLIENT_ID') or os.environ.get('GCLOUD_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET: Optional[str] = os.environ.get('GOOGLE_CLIENT_SECRET') or os.environ.get('GCLOUD_CLIENT_SECRET')
 
     # Web Push Notifications (VAPID keys)
     # Generate keys with: vapid --gen --applicationServerKey
